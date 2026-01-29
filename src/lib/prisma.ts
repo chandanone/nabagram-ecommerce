@@ -2,14 +2,24 @@ import { PrismaClient } from "@prisma/client";
 import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 
-const connectionString = process.env.DATABASE_URL || "postgres://dummy:dummy@localhost:5432/dummy";
+const connectionString = process.env.DATABASE_URL;
+
+if (!connectionString) {
+  throw new Error("DATABASE_URL is not defined in environment variables");
+}
 
 const globalForPrisma = global as unknown as {
   prisma: PrismaClient | undefined;
 };
 
 const createPrismaClient = () => {
-  const pool = new Pool({ connectionString });
+  console.log("Initializing Prisma Client with DATABASE_URL:", !!connectionString);
+  const pool = new Pool({
+    connectionString,
+    ssl: {
+      rejectUnauthorized: false,
+    },
+  });
   const adapter = new PrismaPg(pool);
   return new PrismaClient({
     adapter,
