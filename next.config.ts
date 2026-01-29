@@ -10,9 +10,7 @@ const nextConfig = {
       },
     ],
   },
-  experimental: {
-    reactCompiler: true, // Recommended for your React 19/Next 16 setup
-  },
+  reactCompiler: true,
 };
 
 module.exports = nextConfig;
