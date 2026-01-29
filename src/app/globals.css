@@ -1,26 +1,220 @@
 @import "tailwindcss";
 
+/* =============================================
+   NABAGRAM - HERITAGE MINIMALISM DESIGN SYSTEM
+   ============================================= */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand Colors */
+  --cotton-white: #F8F4EF;
+  --deep-saffron: #D35400;
+  --silk-indigo: #2C3E50;
+  --saffron-light: #E67E22;
+  --saffron-dark: #BA4A00;
+  --indigo-light: #34495E;
+  --indigo-dark: #1A252F;
+  
+  /* Neutral Shades */
+  --cream: #FAF8F5;
+  --warm-gray: #A69B8D;
+  --muted: #6B5B4F;
+  
+  /* Semantic Colors */
+  --background: var(--cotton-white);
+  --foreground: var(--silk-indigo);
+  --primary: var(--deep-saffron);
+  --primary-hover: var(--saffron-dark);
+  --secondary: var(--silk-indigo);
+  --accent: var(--saffron-light);
+  --muted-foreground: var(--warm-gray);
+  
+  /* Glassmorphism */
+  --glass-bg: rgba(248, 244, 239, 0.7);
+  --glass-border: rgba(211, 84, 0, 0.2);
+  --glass-shadow: 0 8px 32px rgba(44, 62, 80, 0.1);
+  --glass-blur: 12px;
+  
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(44, 62, 80, 0.08);
+  --shadow-md: 0 4px 16px rgba(44, 62, 80, 0.12);
+  --shadow-lg: 0 8px 32px rgba(44, 62, 80, 0.16);
+  --shadow-xl: 0 16px 48px rgba(44, 62, 80, 0.2);
+  
+  /* Radius */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 9999px;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-cotton-white: var(--cotton-white);
+  --color-deep-saffron: var(--deep-saffron);
+  --color-silk-indigo: var(--silk-indigo);
+  --color-cream: var(--cream);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Body Styles */
+body {
+  background: linear-gradient(135deg, var(--cotton-white) 0%, var(--cream) 100%);
+  color: var(--foreground);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* Glassmorphism Utilities */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-dark {
+  background: rgba(44, 62, 80, 0.8);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--cotton-white);
+}
+
+.glass-saffron {
+  background: rgba(211, 84, 0, 0.85);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+/* Text Gradient */
+.text-gradient {
+  background: linear-gradient(135deg, var(--deep-saffron) 0%, var(--saffron-light) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(211, 84, 0, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(211, 84, 0, 0.5); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.8s ease-out forwards;
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--cotton-white) 0%,
+    rgba(211, 84, 0, 0.1) 50%,
+    var(--cotton-white) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--cream);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--warm-gray);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--muted);
+}
+
+/* Selection */
+::selection {
+  background: rgba(211, 84, 0, 0.2);
+  color: var(--silk-indigo);
+}
+
+/* Focus States */
+*:focus-visible {
+  outline: 2px solid var(--deep-saffron);
+  outline-offset: 2px;
+}
+
+/* Container */
+.container {
+  width: 100%;
+  max-width: 1400px;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding-inline: 2rem;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@media (min-width: 1280px) {
+  .container {
+    padding-inline: 3rem;
+  }
+}
+
+/* Section Spacing */
+.section {
+  padding-block: 4rem;
+}
+
+@media (min-width: 768px) {
+  .section {
+    padding-block: 6rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section {
+    padding-block: 8rem;
+  }
 }
