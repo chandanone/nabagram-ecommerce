@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import type { Product } from "@prisma/client";
 import Razorpay from "razorpay";
 
 type OrderStatus = "PENDING" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
@@ -38,7 +39,7 @@ export async function createOrder(data: CreateOrderData) {
     // Calculate total
     let total = 0;
     const orderItems = data.items.map((item) => {
-        const product = products.find((p) => p.id === item.productId);
+        const product = products.find((p: Product) => p.id === item.productId);
         if (!product) throw new Error(`Product not found: ${item.productId}`);
 
         const price = Number(product.price);
