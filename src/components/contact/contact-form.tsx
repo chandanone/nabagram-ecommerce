@@ -4,20 +4,40 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Send, CheckCircle, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { submitContactForm } from "@/actions/contact";
 
 export function ContactForm() {
     const [formState, setFormState] = useState<"idle" | "submitting" | "success" | "error">("idle");
+    const [errorMessage, setErrorMessage] = useState("");
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setFormState("submitting");
+        setErrorMessage("");
 
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-        setFormState("success");
+        const formData = new FormData(e.currentTarget);
+        const data = {
+            name: formData.get("name") as string,
+            email: formData.get("email") as string,
+            subject: formData.get("subject") as string,
+            message: formData.get("message") as string,
+        };
 
-        // Reset form after 3 seconds
-        setTimeout(() => setFormState("idle"), 3000);
+        try {
+            const result = await submitContactForm(data);
+            if (result.success) {
+                setFormState("success");
+                (e.target as HTMLFormElement).reset();
+                // Reset form state after 3 seconds
+                setTimeout(() => setFormState("idle"), 3000);
+            } else {
+                setFormState("error");
+                setErrorMessage(result.error || "Failed to send message");
+            }
+        } catch (error) {
+            setFormState("error");
+            setErrorMessage("An unexpected error occurred");
+        }
     };
 
     return (
@@ -29,6 +49,7 @@ export function ContactForm() {
                     </label>
                     <input
                         required
+                        name="name"
                         type="text"
                         id="name"
                         placeholder="John Doe"
@@ -41,6 +62,7 @@ export function ContactForm() {
                     </label>
                     <input
                         required
+                        name="email"
                         type="email"
                         id="email"
                         placeholder="john@example.com"
@@ -55,12 +77,13 @@ export function ContactForm() {
                 </label>
                 <select
                     id="subject"
+                    name="subject"
                     className="w-full h-12 px-4 rounded-lg border border-gray-200 focus:border-[var(--deep-saffron)] focus:ring-1 focus:ring-[var(--deep-saffron)] outline-none transition-all bg-white"
                 >
-                    <option>General Inquiry</option>
-                    <option>Bulk Order</option>
-                    <option>Custom Weave Request</option>
-                    <option>Visit Request</option>
+                    <option value="General Inquiry">General Inquiry</option>
+                    <option value="Bulk Order">Bulk Order</option>
+                    <option value="Custom Weave Request">Custom Weave Request</option>
+                    <option value="Visit Request">Visit Request</option>
                 </select>
             </div>
 
@@ -70,12 +93,20 @@ export function ContactForm() {
                 </label>
                 <textarea
                     required
+                    name="message"
                     id="message"
                     rows={6}
                     placeholder="Tell us what you're looking for..."
                     className="w-full p-4 rounded-lg border border-gray-200 focus:border-[var(--deep-saffron)] focus:ring-1 focus:ring-[var(--deep-saffron)] outline-none transition-all resize-none"
                 />
             </div>
+
+            {formState === "error" && (
+                <div className="p-4 rounded-lg bg-red-50 text-red-600 flex items-center gap-2 text-sm">
+                    <AlertCircle className="h-4 w-4" />
+                    {errorMessage}
+                </div>
+            )}
 
             <Button
                 type="submit"
