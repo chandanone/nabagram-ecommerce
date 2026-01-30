@@ -38,7 +38,7 @@ export async function createOrder(data: CreateOrderData) {
     // Calculate total
     let total = 0;
     const orderItems = data.items.map((item) => {
-        const product = products.find((p) => p.id === item.productId);
+        const product = products.find((p: any) => p.id === item.productId);
         if (!product) throw new Error(`Product not found: ${item.productId}`);
 
         const price = Number(product.price);
