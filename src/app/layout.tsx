@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Outfit, Geist_Mono } from "next/font/google";
 import { Header } from "@/components/layout/header";
-import { Footer } from "@/components/layout/footer";
+import { ConditionalFooter } from "@/components/layout/conditional-footer";
 import { Providers } from "@/components/providers";
 import { Toaster } from "sonner";
 import "./globals.css";
@@ -58,7 +58,7 @@ export default function RootLayout({
         <Providers>
           <Header />
           <main className="min-h-screen pt-20">{children}</main>
-          <Footer />
+          <ConditionalFooter />
           <Toaster position="top-center" richColors />
         </Providers>
       </body>

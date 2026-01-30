@@ -40,7 +40,10 @@ export async function getProducts(filters: ProductFilters = {}) {
         orderBy: { createdAt: "desc" },
     });
 
-    return products;
+    return products.map(product => ({
+        ...product,
+        price: Number(product.price)
+    }));
 }
 
 export async function getProductById(id: string) {
@@ -48,7 +51,12 @@ export async function getProductById(id: string) {
         where: { id },
     });
 
-    return product;
+    if (!product) return null;
+
+    return {
+        ...product,
+        price: Number(product.price)
+    };
 }
 
 export async function getFeaturedProducts() {
@@ -58,7 +66,10 @@ export async function getFeaturedProducts() {
         orderBy: { createdAt: "desc" },
     });
 
-    return products;
+    return products.map(product => ({
+        ...product,
+        price: Number(product.price)
+    }));
 }
 
 export async function createProduct(data: {
@@ -75,7 +86,10 @@ export async function createProduct(data: {
         data,
     });
 
-    return product;
+    return {
+        ...product,
+        price: Number(product.price)
+    };
 }
 
 export async function updateProduct(
@@ -96,7 +110,10 @@ export async function updateProduct(
         data,
     });
 
-    return product;
+    return {
+        ...product,
+        price: Number(product.price)
+    };
 }
 
 export async function deleteProduct(id: string) {

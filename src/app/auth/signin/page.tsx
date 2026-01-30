@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { register, login } from "@/actions/auth"
+import { register, getUserRole } from "@/actions/auth"
 import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { Mail, Lock, User, Eye, EyeOff, Loader2 } from "lucide-react"
@@ -23,16 +23,27 @@ export default function AuthPage() {
         setIsLoading(true)
 
         const formData = new FormData(event.currentTarget)
+        const email = formData.get("email") as string
+        const password = formData.get("password") as string
 
         try {
             if (isLogin) {
-                const result = await login(formData)
+                const result = await signIn("credentials", {
+                    email,
+                    password,
+                    redirect: false,
+                })
+
                 if (result?.error) {
-                    toast.error(result.error)
+                    toast.error("Invalid email or password")
                 } else {
                     toast.success("Welcome back!")
-                    router.push("/")
-                    router.refresh()
+                    const role = await getUserRole(email);
+                    if (role === "ADMIN" || role === "SALESPERSON") {
+                        window.location.href = "/admin"
+                    } else {
+                        window.location.href = "/"
+                    }
                 }
             } else {
                 const result = await register(formData)
@@ -40,8 +51,17 @@ export default function AuthPage() {
                     toast.error(result.error)
                 } else {
                     toast.success("Account created successfully!")
-                    router.push("/")
-                    router.refresh()
+                    // Automatically log in after registration
+                    const loginResult = await signIn("credentials", {
+                        email,
+                        password,
+                        redirect: false,
+                    })
+                    if (loginResult?.error) {
+                        router.push("/")
+                    } else {
+                        window.location.href = "/"
+                    }
                 }
             }
         } catch (error) {

@@ -12,10 +12,11 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { register, login } from "@/actions/auth";
+import { register, getUserRole } from "@/actions/auth";
 import { toast } from "sonner";
 import { Mail, Lock, User, Eye, EyeOff, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/navigation";
 
 interface LoginModalProps {
     open: boolean;
@@ -26,21 +27,35 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
     const [isLogin, setIsLogin] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const router = useRouter();
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
         setIsLoading(true);
 
         const formData = new FormData(event.currentTarget);
+        const email = formData.get("email") as string;
+        const password = formData.get("password") as string;
 
         try {
             if (isLogin) {
-                const result = await login(formData);
+                const result = await signIn("credentials", {
+                    email,
+                    password,
+                    redirect: false,
+                });
+
                 if (result?.error) {
-                    toast.error(result.error);
+                    toast.error("Invalid email or password");
                 } else {
                     toast.success("Welcome back!");
                     onOpenChange(false);
+                    const role = await getUserRole(email);
+                    if (role === "ADMIN" || role === "SALESPERSON") {
+                        window.location.href = "/admin";
+                    } else {
+                        window.location.href = "/";
+                    }
                 }
             } else {
                 const result = await register(formData);
@@ -48,7 +63,13 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                     toast.error(result.error);
                 } else {
                     toast.success("Account created successfully!");
+                    const loginResult = await signIn("credentials", {
+                        email,
+                        password,
+                        redirect: false,
+                    });
                     onOpenChange(false);
+                    window.location.href = "/";
                 }
             }
         } catch (error) {

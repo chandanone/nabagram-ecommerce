@@ -1,36 +1,71 @@
 "use client";
 
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import {
     Plus,
     Search,
     Edit,
     Trash2,
-    MoreVertical,
-    Package
+    Package,
+    Loader2
 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatPrice, getFabricLabel, getCountLabel } from "@/lib/utils";
-
-// Demo products
-const demoProducts = [
-    { id: "1", name: "Royal Muslin 100s Count", price: 12500, fabricType: "MUSLIN", fabricCount: 100, stock: 5, image: "https://images.unsplash.com/photo-1558171813-4c088753af8f?w=200&h=200&fit=crop", featured: true },
-    { id: "2", name: "Printed Silk Saree - Paisley", price: 18500, fabricType: "SILK_SAREE", stock: 3, image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=200&h=200&fit=crop", featured: true },
-    { id: "3", name: "Heritage Muslin 80s", price: 9500, fabricType: "MUSLIN", fabricCount: 80, stock: 8, image: "https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?w=200&h=200&fit=crop", featured: false },
-    { id: "4", name: "Artisan Silk Than", price: 22000, fabricType: "SILK_THAN", stock: 4, image: "https://images.unsplash.com/photo-1583391733956-6c78276477e2?w=200&h=200&fit=crop", featured: true },
-    { id: "5", name: "Classic White Muslin 60s", price: 7500, fabricType: "MUSLIN", fabricCount: 60, stock: 12, image: "https://images.unsplash.com/photo-1594040226829-7f251ab46d80?w=200&h=200&fit=crop", featured: false },
-    { id: "6", name: "Bridal Silk Saree - Gold", price: 35000, fabricType: "SILK_SAREE", stock: 2, image: "https://images.unsplash.com/photo-1609709295948-17d77cb2a69b?w=200&h=200&fit=crop", featured: true },
-];
+import { getProducts, deleteProduct } from "@/actions/products";
+import { ProductModal } from "@/components/admin/product-modal";
+import { toast } from "sonner";
 
 export default function AdminProductsPage() {
+    const [products, setProducts] = useState<any[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [filter, setFilter] = useState("");
+    const [modalOpen, setModalOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState<any>(null);
 
-    const filteredProducts = demoProducts.filter((product) => {
+    const fetchProducts = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const data = await getProducts();
+            setProducts(data);
+        } catch (error) {
+            toast.error("Failed to load products");
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchProducts();
+    }, [fetchProducts]);
+
+    const handleDelete = async (id: string) => {
+        if (!confirm("Are you sure you want to delete this product?")) return;
+
+        try {
+            await deleteProduct(id);
+            toast.success("Product deleted successfully");
+            fetchProducts();
+        } catch (error) {
+            toast.error("Failed to delete product");
+        }
+    };
+
+    const handleEdit = (product: any) => {
+        setSelectedProduct(product);
+        setModalOpen(true);
+    };
+
+    const handleAdd = () => {
+        setSelectedProduct(null);
+        setModalOpen(true);
+    };
+
+    const filteredProducts = products.filter((product) => {
         const matchesSearch = product.name.toLowerCase().includes(search.toLowerCase());
         const matchesFilter = !filter || product.fabricType === filter;
         return matchesSearch && matchesFilter;
@@ -51,7 +86,7 @@ export default function AdminProductsPage() {
                         Manage your product inventory
                     </p>
                 </div>
-                <Button className="gap-2">
+                <Button className="gap-2 bg-[var(--deep-saffron)] hover:bg-[var(--deep-saffron)]/90 text-white" onClick={handleAdd}>
                     <Plus className="h-4 w-4" />
                     Add Product
                 </Button>
@@ -67,7 +102,7 @@ export default function AdminProductsPage() {
                                 placeholder="Search products..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="pl-10"
+                                className="pl-10 h-11 focus-visible:ring-[var(--deep-saffron)]"
                             />
                         </div>
                         <select
@@ -100,71 +135,112 @@ export default function AdminProductsPage() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {filteredProducts.map((product) => (
-                                    <tr key={product.id} className="border-b border-[var(--warm-gray)]/10 last:border-0 hover:bg-[var(--cream)]/50 transition-colors">
-                                        <td className="p-4">
-                                            <div className="flex items-center gap-3">
-                                                <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
-                                                    <Image
-                                                        src={product.image}
-                                                        alt={product.name}
-                                                        fill
-                                                        className="object-cover"
-                                                    />
-                                                </div>
-                                                <div>
-                                                    <p className="font-medium text-[var(--silk-indigo)]">{product.name}</p>
-                                                    {product.fabricCount && (
-                                                        <p className="text-xs text-[var(--muted)]">{getCountLabel(product.fabricCount)}</p>
+                                <AnimatePresence mode="popLayout">
+                                    {isLoading ? (
+                                        <tr>
+                                            <td colSpan={6} className="p-12 text-center">
+                                                <Loader2 className="h-8 w-8 animate-spin mx-auto text-[var(--deep-saffron)] mb-2" />
+                                                <p className="text-sm text-[var(--muted)]">Loading products...</p>
+                                            </td>
+                                        </tr>
+                                    ) : filteredProducts.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={6} className="p-12 text-center text-[var(--muted)]">
+                                                <Package className="h-12 w-12 mx-auto mb-4 opacity-20" />
+                                                No products found
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        filteredProducts.map((product) => (
+                                            <motion.tr
+                                                key={product.id}
+                                                layout
+                                                initial={{ opacity: 0 }}
+                                                animate={{ opacity: 1 }}
+                                                exit={{ opacity: 0 }}
+                                                className="border-b border-[var(--warm-gray)]/10 last:border-0 hover:bg-[var(--cream)]/50 transition-colors"
+                                            >
+                                                <td className="p-4">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
+                                                            {product.images?.[0] ? (
+                                                                <Image
+                                                                    src={product.images[0]}
+                                                                    alt={product.name}
+                                                                    fill
+                                                                    className="object-cover"
+                                                                />
+                                                            ) : (
+                                                                <div className="w-full h-full flex items-center justify-center text-[var(--warm-gray)]">
+                                                                    <Package className="h-6 w-6" />
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <div>
+                                                            <p className="font-medium text-[var(--silk-indigo)]">{product.name}</p>
+                                                            {product.fabricCount && (
+                                                                <p className="text-xs text-[var(--muted)]">{getCountLabel(product.fabricCount)}</p>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td className="p-4">
+                                                    <span className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-[var(--cream)] text-[var(--silk-indigo)]">
+                                                        {getFabricLabel(product.fabricType)}
+                                                    </span>
+                                                </td>
+                                                <td className="p-4 text-right font-medium">{formatPrice(product.price)}</td>
+                                                <td className="p-4 text-center">
+                                                    <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${product.stock < 5 ? "bg-red-100 text-red-700" :
+                                                        product.stock < 10 ? "bg-yellow-100 text-yellow-700" :
+                                                            "bg-green-100 text-green-700"
+                                                        }`}>
+                                                        {product.stock}
+                                                    </span>
+                                                </td>
+                                                <td className="p-4 text-center">
+                                                    {product.featured ? (
+                                                        <span className="text-[var(--deep-saffron)]">★</span>
+                                                    ) : (
+                                                        <span className="text-[var(--warm-gray)] text-lg">☆</span>
                                                     )}
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td className="p-4">
-                                            <span className="inline-flex px-2 py-1 rounded-full text-xs font-medium bg-[var(--cream)] text-[var(--silk-indigo)]">
-                                                {getFabricLabel(product.fabricType)}
-                                            </span>
-                                        </td>
-                                        <td className="p-4 text-right font-medium">{formatPrice(product.price)}</td>
-                                        <td className="p-4 text-center">
-                                            <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${product.stock < 5 ? "bg-red-100 text-red-700" :
-                                                    product.stock < 10 ? "bg-yellow-100 text-yellow-700" :
-                                                        "bg-green-100 text-green-700"
-                                                }`}>
-                                                {product.stock}
-                                            </span>
-                                        </td>
-                                        <td className="p-4 text-center">
-                                            {product.featured ? (
-                                                <span className="text-[var(--deep-saffron)]">★</span>
-                                            ) : (
-                                                <span className="text-[var(--warm-gray)]">☆</span>
-                                            )}
-                                        </td>
-                                        <td className="p-4">
-                                            <div className="flex justify-end gap-2">
-                                                <Button variant="ghost" size="icon">
-                                                    <Edit className="h-4 w-4" />
-                                                </Button>
-                                                <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600 hover:bg-red-50">
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
+                                                </td>
+                                                <td className="p-4">
+                                                    <div className="flex justify-end gap-2">
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => handleEdit(product)}
+                                                            className="hover:bg-blue-50 hover:text-blue-600"
+                                                        >
+                                                            <Edit className="h-4 w-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                                                            onClick={() => handleDelete(product.id)}
+                                                        >
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                </td>
+                                            </motion.tr>
+                                        ))
+                                    )}
+                                </AnimatePresence>
                             </tbody>
                         </table>
                     </div>
-
-                    {filteredProducts.length === 0 && (
-                        <div className="p-12 text-center">
-                            <Package className="h-12 w-12 mx-auto text-[var(--warm-gray)] mb-4" />
-                            <p className="text-[var(--muted)]">No products found</p>
-                        </div>
-                    )}
                 </CardContent>
             </Card>
+
+            <ProductModal
+                open={modalOpen}
+                onOpenChange={setModalOpen}
+                product={selectedProduct}
+                onSuccess={fetchProducts}
+            />
         </div>
     );
 }
