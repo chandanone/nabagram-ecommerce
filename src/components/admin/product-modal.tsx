@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { createProduct, updateProduct } from "@/actions/products";
 import { toast } from "sonner";
 import { Loader2, Plus, Trash2 } from "lucide-react";
+import { SafeProduct } from "@/lib/types";
 
 // Define possible fabric types locally to avoid importing from @prisma/client in client components
 // This fixes the 'Can't resolve .prisma/client/index-browser' build error
@@ -23,7 +24,7 @@ type LocalFabricType = (typeof FABRIC_TYPES)[number];
 interface ProductModalProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
-    product?: any;
+    product?: SafeProduct | null;
     onSuccess: () => void;
 }
 

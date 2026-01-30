@@ -1,7 +1,8 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
+import { SafeProduct } from "@/lib/types";
 
 export const FABRIC_TYPES = {
     MUSLIN: "MUSLIN",
@@ -19,11 +20,11 @@ export interface ProductFilters {
     search?: string;
 }
 
-export async function getProducts(filters: ProductFilters = {}) {
-    const where: any = {};
+export async function getProducts(filters: ProductFilters = {}): Promise<SafeProduct[]> {
+    const where: Prisma.ProductWhereInput = {};
 
     if (filters.type && Object.values(FABRIC_TYPES).includes(filters.type as FabricType)) {
-        where.fabricType = filters.type as FabricType;
+        where.fabricType = filters.type as "MUSLIN" | "SILK_SAREE" | "SILK_THAN";
     }
 
     if (filters.count) {
@@ -48,13 +49,13 @@ export async function getProducts(filters: ProductFilters = {}) {
         orderBy: { createdAt: "desc" },
     });
 
-    return products.map(product => ({
+    return products.map((product) => ({
         ...product,
         price: Number(product.price)
     }));
 }
 
-export async function getProductById(id: string) {
+export async function getProductById(id: string): Promise<SafeProduct | null> {
     const product = await prisma.product.findUnique({
         where: { id },
     });
@@ -67,14 +68,14 @@ export async function getProductById(id: string) {
     };
 }
 
-export async function getFeaturedProducts() {
+export async function getFeaturedProducts(): Promise<SafeProduct[]> {
     const products = await prisma.product.findMany({
         where: { featured: true },
         take: 4,
         orderBy: { createdAt: "desc" },
     });
 
-    return products.map(product => ({
+    return products.map((product) => ({
         ...product,
         price: Number(product.price)
     }));
@@ -83,15 +84,18 @@ export async function getFeaturedProducts() {
 export async function createProduct(data: {
     name: string;
     description: string;
-    price: number | string | Prisma.Decimal;
+    price: number | string;
     fabricType: FabricType;
     fabricCount?: number;
     images: string[];
     stock: number;
     featured?: boolean;
-}) {
+}): Promise<SafeProduct> {
     const product = await prisma.product.create({
-        data,
+        data: {
+            ...data,
+            price: data.price,
+        } as Prisma.ProductCreateInput,
     });
 
     return {
@@ -105,17 +109,17 @@ export async function updateProduct(
     data: Partial<{
         name: string;
         description: string;
-        price: number | string | Prisma.Decimal;
+        price: number | string;
         fabricType: FabricType;
         fabricCount: number;
         images: string[];
         stock: number;
         featured: boolean;
     }>
-) {
+): Promise<SafeProduct> {
     const product = await prisma.product.update({
         where: { id },
-        data,
+        data: data as Prisma.ProductUpdateInput,
     });
 
     return {

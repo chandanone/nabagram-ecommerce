@@ -18,14 +18,15 @@ import { formatPrice, getFabricLabel, getCountLabel } from "@/lib/utils";
 import { getProducts, deleteProduct } from "@/actions/products";
 import { ProductModal } from "@/components/admin/product-modal";
 import { toast } from "sonner";
+import { SafeProduct } from "@/lib/types";
 
 export default function AdminProductsPage() {
-    const [products, setProducts] = useState<any[]>([]);
+    const [products, setProducts] = useState<SafeProduct[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [search, setSearch] = useState("");
     const [filter, setFilter] = useState("");
     const [modalOpen, setModalOpen] = useState(false);
-    const [selectedProduct, setSelectedProduct] = useState<any>(null);
+    const [selectedProduct, setSelectedProduct] = useState<SafeProduct | null>(null);
 
     const fetchProducts = useCallback(async () => {
         setIsLoading(true);
@@ -55,7 +56,7 @@ export default function AdminProductsPage() {
         }
     };
 
-    const handleEdit = (product: any) => {
+    const handleEdit = (product: SafeProduct) => {
         setSelectedProduct(product);
         setModalOpen(true);
     };
