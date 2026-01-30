@@ -13,14 +13,19 @@ const globalForPrisma = global as unknown as {
 };
 
 const createPrismaClient = () => {
-  console.log("Initializing Prisma Client with DATABASE_URL:", !!connectionString);
   const pool = new Pool({
     connectionString,
     ssl: {
-      rejectUnauthorized: false,
+      rejectUnauthorized: true,
     },
+    // Add these for serverless stability:
+    max: 10,                 // Limit the number of clients in the pool
+    idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
+    connectionTimeoutMillis: 2000, // Return an error if a connection takes > 2 seconds
   });
+
   const adapter = new PrismaPg(pool);
+
   return new PrismaClient({
     adapter,
     log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],

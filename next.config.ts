@@ -23,6 +23,11 @@ const nextConfig = {
         hostname: '**.fbcdn.net', // Instagram profile pics are often hosted here
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'ui-avatars.com', // Add this for fallback initials
+        pathname: '/**',
+      },
     ],
   },
   reactCompiler: true,

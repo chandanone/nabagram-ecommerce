@@ -3,6 +3,7 @@ import { Outfit, Geist_Mono } from "next/font/google";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { Providers } from "@/components/providers";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -58,6 +59,7 @@ export default function RootLayout({
           <Header />
           <main className="min-h-screen pt-20">{children}</main>
           <Footer />
+          <Toaster position="top-center" richColors />
         </Providers>
       </body>
     </html>

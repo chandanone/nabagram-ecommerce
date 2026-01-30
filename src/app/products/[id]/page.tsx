@@ -93,8 +93,8 @@ export default function ProductDetailPage() {
                                         key={index}
                                         onClick={() => setSelectedImage(index)}
                                         className={`relative aspect-square w-20 rounded-xl overflow-hidden border-2 transition-all ${selectedImage === index
-                                                ? "border-[var(--deep-saffron)]"
-                                                : "border-transparent hover:border-[var(--warm-gray)]"
+                                            ? "border-[var(--deep-saffron)]"
+                                            : "border-transparent hover:border-[var(--warm-gray)]"
                                             }`}
                                     >
                                         <Image

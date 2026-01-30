@@ -14,10 +14,9 @@ export default async function AdminLayout({
         redirect("/");
     }
 
-    // In production, uncomment this check
-    // if (session.user.role === "USER") {
-    //   redirect("/");
-    // }
+    if (session.user.role === "USER") {
+        redirect("/");
+    }
 
     return (
         <div className="min-h-screen bg-[var(--cream)]">
