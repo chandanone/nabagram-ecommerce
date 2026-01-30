@@ -137,7 +137,7 @@ export default async function AccountPage() {
 
                                                 <div className="flex items-center gap-4">
                                                     <div className="flex -space-x-2">
-                                                        {order.items.slice(0, 3).map((item, idx) => (
+                                                        {(order.items || []).slice(0, 3).map((item, idx) => (
                                                             <div key={idx} className="relative w-10 h-10 rounded-lg border-2 border-white overflow-hidden shadow-sm">
                                                                 <Image
                                                                     src={item.product.images[0]}
@@ -147,23 +147,23 @@ export default async function AccountPage() {
                                                                 />
                                                             </div>
                                                         ))}
-                                                        {order.items.length > 3 && (
+                                                        {(order.items || []).length > 3 && (
                                                             <div className="relative w-10 h-10 rounded-lg border-2 border-white bg-[var(--warm-gray)]/10 flex items-center justify-center text-[10px] font-bold text-[var(--silk-indigo)] shadow-sm">
-                                                                +{order.items.length - 3}
+                                                                +{(order.items || []).length - 3}
                                                             </div>
                                                         )}
                                                     </div>
                                                     <div className="flex-1">
                                                         <p className="text-sm font-medium text-[var(--silk-indigo)] line-clamp-1">
-                                                            {order.items.map(item => item.product.name).join(', ')}
+                                                            {(order.items || []).map(item => item.product.name).join(', ')}
                                                         </p>
                                                         <p className="text-xs text-[var(--muted)]">
-                                                            {order.items.length} {order.items.length === 1 ? 'item' : 'items'}
+                                                            {(order.items || []).length} {(order.items || []).length === 1 ? 'item' : 'items'}
                                                         </p>
                                                     </div>
                                                     <div className="text-right">
                                                         <p className="text-lg font-bold text-[var(--silk-indigo)] tabular-nums">
-                                                            {formatPrice(order.total.toString())}
+                                                            {formatPrice(order.total)}
                                                         </p>
                                                     </div>
                                                 </div>

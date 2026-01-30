@@ -94,6 +94,23 @@ export async function createOrder(data: CreateOrderData) {
     };
 }
 
+import { SafeOrder } from "@/lib/types";
+
+// ... previous imports ...
+
+// Helper to serialize order data
+const serializeOrder = (order: any): SafeOrder => ({
+    ...order,
+    total: Number(order.total),
+    items: order.items?.map((item: any) => ({
+        ...item,
+        product: {
+            ...item.product,
+            price: Number(item.product.price),
+        },
+    })),
+});
+
 export async function verifyPayment(
     orderId: string,
     razorpayData: {
@@ -101,7 +118,7 @@ export async function verifyPayment(
         razorpay_payment_id: string;
         razorpay_signature: string;
     }
-) {
+): Promise<SafeOrder> {
     const crypto = await import("crypto");
 
     const body = razorpayData.razorpay_order_id + "|" + razorpayData.razorpay_payment_id;
@@ -121,14 +138,17 @@ export async function verifyPayment(
             status: "PAID",
             razorpayPaymentId: razorpayData.razorpay_payment_id,
         },
+        include: {
+            items: {
+                include: {
+                    product: true,
+                },
+            },
+        },
     });
 
     // Reduce stock
-    const orderItems = await prisma.orderItem.findMany({
-        where: { orderId },
-    });
-
-    for (const item of orderItems) {
+    for (const item of order.items) {
         await prisma.product.update({
             where: { id: item.productId },
             data: {
@@ -137,10 +157,10 @@ export async function verifyPayment(
         });
     }
 
-    return order;
+    return serializeOrder(order);
 }
 
-export async function getOrders() {
+export async function getOrders(): Promise<SafeOrder[]> {
     const session = await auth();
     if (!session?.user?.id) {
         throw new Error("Unauthorized");
@@ -158,10 +178,10 @@ export async function getOrders() {
         orderBy: { createdAt: "desc" },
     });
 
-    return orders;
+    return orders.map(serializeOrder);
 }
 
-export async function getAllOrders() {
+export async function getAllOrders(): Promise<SafeOrder[]> {
     const session = await auth();
     if (!session?.user?.id || session.user.role === "USER") {
         throw new Error("Unauthorized");
@@ -179,10 +199,10 @@ export async function getAllOrders() {
         orderBy: { createdAt: "desc" },
     });
 
-    return orders;
+    return orders.map(serializeOrder);
 }
 
-export async function updateOrderStatus(orderId: string, status: OrderStatus) {
+export async function updateOrderStatus(orderId: string, status: OrderStatus): Promise<SafeOrder> {
     const session = await auth();
     if (!session?.user?.id || session.user.role === "USER") {
         throw new Error("Unauthorized");
@@ -191,7 +211,14 @@ export async function updateOrderStatus(orderId: string, status: OrderStatus) {
     const order = await prisma.order.update({
         where: { id: orderId },
         data: { status },
+        include: {
+            items: {
+                include: {
+                    product: true,
+                },
+            },
+        },
     });
 
-    return order;
+    return serializeOrder(order);
 }
