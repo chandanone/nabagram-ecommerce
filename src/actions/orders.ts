@@ -41,7 +41,8 @@ export async function createOrder(data: CreateOrderData) {
         const product = products.find((p) => p.id === item.productId);
         if (!product) throw new Error(`Product not found: ${item.productId}`);
 
-        const price = product.price;
+        // Decimal math prevents floating point issues with currency
+        const price = new Prisma.Decimal(product.price);
         total = total.add(price.mul(item.quantity));
 
         return {
@@ -71,6 +72,7 @@ export async function createOrder(data: CreateOrderData) {
             shippingCity: data.shipping.city,
             shippingState: data.shipping.state,
             shippingPincode: data.shipping.pincode,
+            status: "PENDING" as OrderStatus, // Explicit cast
             items: {
                 create: orderItems,
             },
