@@ -1,7 +1,15 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { FabricType, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+
+export const FABRIC_TYPES = {
+    MUSLIN: "MUSLIN",
+    SILK_SAREE: "SILK_SAREE",
+    SILK_THAN: "SILK_THAN"
+} as const;
+
+export type FabricType = (typeof FABRIC_TYPES)[keyof typeof FABRIC_TYPES];
 
 export interface ProductFilters {
     type?: FabricType | string;
@@ -14,7 +22,7 @@ export interface ProductFilters {
 export async function getProducts(filters: ProductFilters = {}) {
     const where: any = {};
 
-    if (filters.type && Object.values(FabricType).includes(filters.type as FabricType)) {
+    if (filters.type && Object.values(FABRIC_TYPES).includes(filters.type as FabricType)) {
         where.fabricType = filters.type as FabricType;
     }
 
