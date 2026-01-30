@@ -17,6 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatPrice } from "@/lib/utils";
 import Link from "next/link";
 import { signOut } from "@/lib/auth";
+import { SignOutButton } from "@/components/auth/sign-out-button";
 
 export default async function AccountPage() {
     const session = await auth();
@@ -65,15 +66,7 @@ export default async function AccountPage() {
                                 </div>
 
                                 <div className="mt-8 pt-6 border-t border-[var(--warm-gray)]/10 space-y-3">
-                                    <form action={async () => {
-                                        "use server";
-                                        await signOut({ redirectTo: "/" });
-                                    }}>
-                                        <Button variant="ghost" className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50 gap-3">
-                                            <LogOut className="h-4 w-4" />
-                                            Sign Out
-                                        </Button>
-                                    </form>
+                                    <SignOutButton className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50" />
 
                                     {user.role === "ADMIN" && (
                                         <Link href="/admin">
@@ -135,8 +128,8 @@ export default async function AccountPage() {
                                                         </div>
                                                     </div>
                                                     <div className={`px-3 py-1 rounded-full text-xs font-bold ${order.status === 'PAID' ? 'bg-green-100 text-green-700' :
-                                                            order.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' :
-                                                                'bg-blue-100 text-blue-700'
+                                                        order.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' :
+                                                            'bg-blue-100 text-blue-700'
                                                         }`}>
                                                         {order.status}
                                                     </div>

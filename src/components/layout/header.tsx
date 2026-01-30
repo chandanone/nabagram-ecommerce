@@ -7,6 +7,7 @@ import { Menu, X, ShoppingBag, User, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
 import { LoginModal } from "@/components/auth/login-modal";
+import { SignOutButton } from "@/components/auth/sign-out-button";
 
 const navLinks = [
     { href: "/", label: "Home" },
@@ -35,8 +36,8 @@ export function Header() {
                 initial={{ y: -100 }}
                 animate={{ y: 0 }}
                 className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled
-                        ? "glass shadow-lg py-3"
-                        : "bg-transparent py-5"
+                    ? "glass shadow-lg py-3"
+                    : "bg-transparent py-5"
                     }`}
             >
                 <div className="container">
@@ -86,12 +87,22 @@ export function Header() {
                             </Link>
 
                             {session ? (
-                                <Link href="/account">
-                                    <Button variant="glass" size="sm" className="hidden sm:flex gap-2">
-                                        <User className="h-4 w-4" />
-                                        {session.user?.name?.split(" ")[0]}
-                                    </Button>
-                                </Link>
+                                <div className="flex items-center gap-2">
+                                    <Link href="/account" className="hidden sm:block">
+                                        <Button variant="glass" size="sm" className="gap-2">
+                                            <User className="h-4 w-4" />
+                                            {session.user?.name?.split(" ")[0]}
+                                        </Button>
+                                    </Link>
+                                    <SignOutButton
+                                        variant="ghost"
+                                        size="icon"
+                                        className="hidden sm:flex"
+                                        showIcon={true}
+                                    >
+                                        <span className="sr-only">Sign Out</span>
+                                    </SignOutButton>
+                                </div>
                             ) : (
                                 <Button
                                     variant="default"
@@ -136,7 +147,20 @@ export function Header() {
                                         {link.label}
                                     </Link>
                                 ))}
-                                {!session && (
+                                {session ? (
+                                    <div className="flex flex-col gap-2 mt-4">
+                                        <Link href="/account" onClick={() => setIsOpen(false)}>
+                                            <Button variant="glass" className="w-full justify-start gap-3">
+                                                <User className="h-4 w-4" />
+                                                My Account
+                                            </Button>
+                                        </Link>
+                                        <SignOutButton
+                                            variant="ghost"
+                                            className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                                        />
+                                    </div>
+                                ) : (
                                     <Button
                                         variant="default"
                                         className="mt-4"
