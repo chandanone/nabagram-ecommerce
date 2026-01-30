@@ -11,10 +11,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FabricType } from "@prisma/client";
 import { createProduct, updateProduct } from "@/actions/products";
 import { toast } from "sonner";
 import { Loader2, Plus, Trash2 } from "lucide-react";
+
+// Define possible fabric types locally to avoid importing from @prisma/client in client components
+// This fixes the 'Can't resolve .prisma/client/index-browser' build error
+const FABRIC_TYPES = ["MUSLIN", "SILK_SAREE", "SILK_THAN"] as const;
+type LocalFabricType = (typeof FABRIC_TYPES)[number];
 
 interface ProductModalProps {
     open: boolean;
@@ -27,7 +31,7 @@ interface ProductFormData {
     name: string;
     description: string;
     price: string;
-    fabricType: FabricType;
+    fabricType: string;
     fabricCount: string;
     stock: string;
     featured: boolean;
@@ -40,7 +44,7 @@ export function ProductModal({ open, onOpenChange, product, onSuccess }: Product
         name: "",
         description: "",
         price: "",
-        fabricType: FabricType.MUSLIN,
+        fabricType: "MUSLIN",
         fabricCount: "",
         stock: "0",
         featured: false,
@@ -53,7 +57,7 @@ export function ProductModal({ open, onOpenChange, product, onSuccess }: Product
                 name: product.name || "",
                 description: product.description || "",
                 price: product.price?.toString() || "",
-                fabricType: (product.fabricType as FabricType) || FabricType.MUSLIN,
+                fabricType: product.fabricType || "MUSLIN",
                 fabricCount: product.fabricCount?.toString() || "",
                 stock: product.stock?.toString() || "0",
                 featured: product.featured || false,
@@ -64,7 +68,7 @@ export function ProductModal({ open, onOpenChange, product, onSuccess }: Product
                 name: "",
                 description: "",
                 price: "",
-                fabricType: FabricType.MUSLIN,
+                fabricType: "MUSLIN",
                 fabricCount: "",
                 stock: "0",
                 featured: false,
@@ -87,7 +91,7 @@ export function ProductModal({ open, onOpenChange, product, onSuccess }: Product
             };
 
             if (product) {
-                await updateProduct(product.id, data);
+                await updateProduct(product.id, data as any);
                 toast.success("Product updated successfully");
             } else {
                 await createProduct(data as any);
@@ -151,10 +155,10 @@ export function ProductModal({ open, onOpenChange, product, onSuccess }: Product
                             <select
                                 id="fabricType"
                                 value={formData.fabricType}
-                                onChange={(e) => setFormData({ ...formData, fabricType: e.target.value as FabricType })}
+                                onChange={(e) => setFormData({ ...formData, fabricType: e.target.value })}
                                 className="w-full h-10 px-3 rounded-md border border-[var(--warm-gray)]/30 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[var(--deep-saffron)]"
                             >
-                                {Object.values(FabricType).map((type) => (
+                                {FABRIC_TYPES.map((type) => (
                                     <option key={type} value={type}>
                                         {type.replace("_", " ")}
                                     </option>
