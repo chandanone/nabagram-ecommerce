@@ -2,7 +2,8 @@
 
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-import { OrderStatus, Prisma } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+type OrderStatus = "PENDING" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
 import Razorpay from "razorpay";
 
 const razorpay = new Razorpay({
@@ -115,7 +116,7 @@ export async function verifyPayment(
     const order = await prisma.order.update({
         where: { id: orderId },
         data: {
-            status: OrderStatus.PAID,
+            status: "PAID",
             razorpayPaymentId: razorpayData.razorpay_payment_id,
         },
     });
