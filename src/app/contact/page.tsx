@@ -86,13 +86,19 @@ export default function ContactPage() {
                             </div>
                         </div>
 
-                        {/* Map Placeholder */}
-                        <div className="aspect-video bg-[var(--silk-indigo)]/5 rounded-2xl flex items-center justify-center text-[var(--muted)] border border-[var(--cream)]">
-                            <span className="flex items-center gap-2">
-                                <MapPin className="h-5 w-5" />
-                                Google Maps Integration
-                            </span>
-                        </div>
+                        {/* Map */}
+                        {/* <div className="aspect-video w-full rounded-2xl overflow-hidden shadow-sm border border-[var(--warm-gray)]/20 relative">
+                            <iframe
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d116345.92244247545!2d88.23235474335938!3d24.180126784379468!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39f977bd00000001%3A0xe530c34f0e75c58b!2sNabagram%20Seva%20Sangha!5e0!3m2!1sen!2sin!4v1706600000000!5m2!1sen!2sin"
+                                width="100%"
+                                height="100%"
+                                style={{ border: 0 }}
+                                allowFullScreen
+                                loading="lazy"
+                                referrerPolicy="no-referrer-when-downgrade"
+                                className="absolute inset-0"
+                            ></iframe>
+                        </div> */}
                     </motion.div>
 
                     {/* Form */}

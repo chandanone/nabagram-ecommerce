@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { FabricType } from "@prisma/client";
+import { FabricType, Prisma } from "@prisma/client";
 
 export interface ProductFilters {
     type?: FabricType | string;
@@ -64,7 +64,7 @@ export async function getFeaturedProducts() {
 export async function createProduct(data: {
     name: string;
     description: string;
-    price: number;
+    price: number | string | Prisma.Decimal;
     fabricType: FabricType;
     fabricCount?: number;
     images: string[];
@@ -83,7 +83,7 @@ export async function updateProduct(
     data: Partial<{
         name: string;
         description: string;
-        price: number;
+        price: number | string | Prisma.Decimal;
         fabricType: FabricType;
         fabricCount: number;
         images: string[];

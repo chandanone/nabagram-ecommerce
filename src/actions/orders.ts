@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-import { OrderStatus } from "@prisma/client";
+import { OrderStatus, Prisma } from "@prisma/client";
 import Razorpay from "razorpay";
 
 const razorpay = new Razorpay({
@@ -35,24 +35,24 @@ export async function createOrder(data: CreateOrderData) {
     });
 
     // Calculate total
-    let total = 0;
+    let total = new Prisma.Decimal(0);
     const orderItems = data.items.map((item) => {
-        const product = products.find((p: any) => p.id === item.productId);
+        const product = products.find((p) => p.id === item.productId);
         if (!product) throw new Error(`Product not found: ${item.productId}`);
 
-        const price = Number(product.price);
-        total += price * item.quantity;
+        const price = product.price;
+        total = total.add(price.mul(item.quantity));
 
         return {
             productId: item.productId,
             quantity: item.quantity,
-            price: product.price,
+            price: price,
         };
     });
 
     // Create Razorpay order
     const razorpayOrder = await razorpay.orders.create({
-        amount: Math.round(total * 100), // Amount in paise
+        amount: total.mul(100).toNumber(), // Amount in paise
         currency: "INR",
         receipt: `order_${Date.now()}`,
     });
