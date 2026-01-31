@@ -108,73 +108,73 @@ export default async function AccountPage() {
                         ) : (
                             <div className="space-y-4">
                                 {orders.map((order) => (
-                                    <Card key={order.id} className="glass border-none hover:shadow-md transition-all overflow-hidden">
-                                        <div className="flex flex-col sm:flex-row">
-                                            <div className="p-6 flex-1">
-                                                <div className="flex items-center justify-between mb-4">
-                                                    <div className="space-y-1">
-                                                        <p className="text-xs font-medium text-[var(--muted)] uppercase tracking-wider">
-                                                            Order ID: {order.id.slice(-8).toUpperCase()}
-                                                        </p>
-                                                        <div className="flex items-center gap-2 text-[var(--silk-indigo)]">
-                                                            <Calendar className="h-4 w-4 text-[var(--muted)]" />
-                                                            <span className="font-medium">
-                                                                {new Date(order.createdAt).toLocaleDateString('en-IN', {
-                                                                    day: 'numeric',
-                                                                    month: 'short',
-                                                                    year: 'numeric'
-                                                                })}
-                                                            </span>
+                                    <Link key={order.id} href={`/account/orders/${order.id}`}>
+                                        <Card className="glass border-none hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden group">
+                                            <div className="flex flex-col sm:flex-row">
+                                                <div className="p-6 flex-1">
+                                                    <div className="flex items-center justify-between mb-4">
+                                                        <div className="space-y-1">
+                                                            <p className="text-[10px] font-bold text-[var(--muted)] uppercase tracking-widest">
+                                                                Order #{order.id.slice(-8).toUpperCase()}
+                                                            </p>
+                                                            <div className="flex items-center gap-2 text-[var(--silk-indigo)]">
+                                                                <Calendar className="h-3.5 w-3.5 text-[var(--deep-saffron)]" />
+                                                                <span className="font-bold text-sm">
+                                                                    {new Date(order.createdAt).toLocaleDateString('en-IN', {
+                                                                        day: 'numeric',
+                                                                        month: 'short',
+                                                                        year: 'numeric'
+                                                                    })}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div className={`px-3 py-1 rounded-full text-[10px] font-bold border ${order.status === 'PAID' ? 'bg-green-50 text-green-700 border-green-100' :
+                                                            order.status === 'PENDING' ? 'bg-yellow-50 text-yellow-700 border-yellow-100' :
+                                                                'bg-blue-50 text-blue-700 border-blue-100'
+                                                            }`}>
+                                                            {order.status}
                                                         </div>
                                                     </div>
-                                                    <div className={`px-3 py-1 rounded-full text-xs font-bold ${order.status === 'PAID' ? 'bg-green-100 text-green-700' :
-                                                        order.status === 'PENDING' ? 'bg-yellow-100 text-yellow-700' :
-                                                            'bg-blue-100 text-blue-700'
-                                                        }`}>
-                                                        {order.status}
-                                                    </div>
-                                                </div>
 
-                                                <div className="flex items-center gap-4">
-                                                    <div className="flex -space-x-2">
-                                                        {(order.items || []).slice(0, 3).map((item, idx) => (
-                                                            <div key={idx} className="relative w-10 h-10 rounded-lg border-2 border-white overflow-hidden shadow-sm">
-                                                                <Image
-                                                                    src={item.product.images[0]}
-                                                                    alt={item.product.name}
-                                                                    fill
-                                                                    className="object-cover"
-                                                                />
-                                                            </div>
-                                                        ))}
-                                                        {(order.items || []).length > 3 && (
-                                                            <div className="relative w-10 h-10 rounded-lg border-2 border-white bg-[var(--warm-gray)]/10 flex items-center justify-center text-[10px] font-bold text-[var(--silk-indigo)] shadow-sm">
-                                                                +{(order.items || []).length - 3}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                    <div className="flex-1">
-                                                        <p className="text-sm font-medium text-[var(--silk-indigo)] line-clamp-1">
-                                                            {(order.items || []).map(item => item.product.name).join(', ')}
-                                                        </p>
-                                                        <p className="text-xs text-[var(--muted)]">
-                                                            {(order.items || []).length} {(order.items || []).length === 1 ? 'item' : 'items'}
-                                                        </p>
-                                                    </div>
-                                                    <div className="text-right">
-                                                        <p className="text-lg font-bold text-[var(--silk-indigo)] tabular-nums">
-                                                            {formatPrice(order.total)}
-                                                        </p>
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="flex -space-x-3">
+                                                            {(order.items || []).slice(0, 3).map((item, idx) => (
+                                                                <div key={idx} className="relative w-12 h-14 rounded-xl border-2 border-white overflow-hidden shadow-md group-hover:rotate-3 transition-transform">
+                                                                    <Image
+                                                                        src={item.product.images[0]}
+                                                                        alt={item.product.name}
+                                                                        fill
+                                                                        className="object-cover"
+                                                                    />
+                                                                </div>
+                                                            ))}
+                                                            {(order.items || []).length > 3 && (
+                                                                <div className="relative w-12 h-14 rounded-xl border-2 border-white bg-[var(--cotton-white)] flex items-center justify-center text-[10px] font-black text-[var(--silk-indigo)] shadow-md">
+                                                                    +{(order.items || []).length - 3}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-sm font-bold text-[var(--silk-indigo)] truncate">
+                                                                {(order.items || []).map(item => item.product.name).join(', ')}
+                                                            </p>
+                                                            <p className="text-xs text-[var(--muted)] font-medium">
+                                                                {(order.items || []).length} {(order.items || []).length === 1 ? 'item' : 'items'}
+                                                            </p>
+                                                        </div>
+                                                        <div className="text-right">
+                                                            <p className="text-lg font-black text-[var(--silk-indigo)] tabular-nums">
+                                                                {formatPrice(order.total)}
+                                                            </p>
+                                                        </div>
                                                     </div>
                                                 </div>
+                                                <div className="bg-[var(--silk-indigo)]/5 p-4 flex items-center justify-center group-hover:bg-[var(--deep-saffron)]/10 transition-colors">
+                                                    <ChevronRight className="h-5 w-5 text-[var(--silk-indigo)] group-hover:translate-x-1 transition-transform" />
+                                                </div>
                                             </div>
-                                            <div className="bg-[var(--silk-indigo)]/5 p-4 flex items-center justify-center">
-                                                <Button variant="ghost" size="icon" className="text-[var(--silk-indigo)] hover:bg-[var(--silk-indigo)]/10">
-                                                    <ChevronRight className="h-5 w-5" />
-                                                </Button>
-                                            </div>
-                                        </div>
-                                    </Card>
+                                        </Card>
+                                    </Link>
                                 ))}
                             </div>
                         )}
