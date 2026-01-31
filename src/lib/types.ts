@@ -29,6 +29,8 @@ export type FabricType = (typeof FABRIC_TYPES)[keyof typeof FABRIC_TYPES];
 export interface ProductFilters {
     type?: string;
     count?: string;
+    minPrice?: number;
+    maxPrice?: number;
     priceRange?: [number, number];
     search?: string;
 }
