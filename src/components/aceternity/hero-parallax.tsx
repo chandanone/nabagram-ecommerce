@@ -134,9 +134,11 @@ function Header() {
     );
 }
 
+import { MotionValue } from "framer-motion";
+
 interface ProductCardProps {
     product: Product;
-    translate: any;
+    translate: MotionValue<number>;
 }
 
 function ProductCard({ product, translate }: ProductCardProps) {

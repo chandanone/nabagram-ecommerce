@@ -11,9 +11,38 @@ import { Input } from "@/components/ui/input";
 import { useCart } from "@/lib/cart";
 import { formatPrice, getFabricLabel } from "@/lib/utils";
 
+interface RazorpayResponse {
+    razorpay_payment_id: string;
+    razorpay_order_id: string;
+    razorpay_signature: string;
+}
+
+interface RazorpayOptions {
+    key: string;
+    amount: number;
+    currency: string;
+    name: string;
+    description: string;
+    image: string;
+    handler: (response: RazorpayResponse) => void;
+    prefill: {
+        name: string;
+        email: string;
+        contact: string;
+    };
+    notes: {
+        address: string;
+    };
+    theme: {
+        color: string;
+    };
+}
+
 declare global {
     interface Window {
-        Razorpay: any;
+        Razorpay: new (options: RazorpayOptions) => {
+            open: () => void;
+        };
     }
 }
 
@@ -53,7 +82,7 @@ export default function CheckoutPage() {
             name: "Nabagram Seva Sangha",
             description: "Handwoven Textile Purchase",
             image: "/logo.png",
-            handler: function (response: any) {
+            handler: function (response: RazorpayResponse) {
                 // Payment successful
                 setOrderSuccess(true);
                 clearCart();

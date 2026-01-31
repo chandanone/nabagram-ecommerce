@@ -3,6 +3,7 @@ import Google from "next-auth/providers/google";
 import Instagram from "next-auth/providers/instagram";
 import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
+import { Adapter } from "next-auth/adapters";
 import { prisma } from "@/lib/prisma";
 import type { Role } from "@prisma/client";
 import bcrypt from "bcryptjs";
@@ -23,7 +24,7 @@ declare module "next-auth" {
 }
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
-    adapter: PrismaAdapter(prisma) as any,
+    adapter: PrismaAdapter(prisma) as Adapter,
     session: { strategy: "jwt" },
     providers: [
         Google({
@@ -47,7 +48,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
                 const user = await prisma.user.findUnique({
                     where: { email: credentials.email as string },
-                }) as any;
+                });
 
                 if (!user || !user.password) {
                     return null;

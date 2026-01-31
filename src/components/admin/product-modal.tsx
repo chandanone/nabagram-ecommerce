@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { createProduct, updateProduct } from "@/actions/products";
 import { toast } from "sonner";
 import { Loader2, Plus, Trash2 } from "lucide-react";
-import { SafeProduct } from "@/lib/types";
+import { SafeProduct, FabricType } from "@/lib/types";
 
 // Define possible fabric types locally to avoid importing from @prisma/client in client components
 // This fixes the 'Can't resolve .prisma/client/index-browser' build error
@@ -32,7 +32,7 @@ interface ProductFormData {
     name: string;
     description: string;
     price: string;
-    fabricType: string;
+    fabricType: FabricType;
     fabricCount: string;
     stock: string;
     featured: boolean;
@@ -84,18 +84,21 @@ export function ProductModal({ open, onOpenChange, product, onSuccess }: Product
 
         try {
             const data = {
-                ...formData,
+                name: formData.name,
+                description: formData.description,
                 price: parseFloat(formData.price),
-                stock: parseInt(formData.stock),
+                fabricType: formData.fabricType,
                 fabricCount: formData.fabricCount ? parseInt(formData.fabricCount) : undefined,
+                stock: parseInt(formData.stock),
+                featured: formData.featured,
                 images: formData.images.filter(img => img.trim() !== "")
             };
 
             if (product) {
-                await updateProduct(product.id, data as any);
+                await updateProduct(product.id, data);
                 toast.success("Product updated successfully");
             } else {
-                await createProduct(data as any);
+                await createProduct(data);
                 toast.success("Product created successfully");
             }
             onSuccess();
@@ -156,7 +159,7 @@ export function ProductModal({ open, onOpenChange, product, onSuccess }: Product
                             <select
                                 id="fabricType"
                                 value={formData.fabricType}
-                                onChange={(e) => setFormData({ ...formData, fabricType: e.target.value })}
+                                onChange={(e) => setFormData({ ...formData, fabricType: e.target.value as FabricType })}
                                 className="w-full h-10 px-3 rounded-md border border-[var(--warm-gray)]/30 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[var(--deep-saffron)]"
                             >
                                 {FABRIC_TYPES.map((type) => (

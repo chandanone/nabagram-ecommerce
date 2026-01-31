@@ -29,7 +29,7 @@ export async function register(formData: FormData) {
                 email,
                 password: hashedPassword,
                 role: "USER",
-            } as any,
+            },
         })
 
         return { success: true }

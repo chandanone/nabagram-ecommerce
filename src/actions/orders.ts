@@ -2,10 +2,11 @@
 
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-import type { Product } from "@prisma/client";
+import { Prisma } from "@prisma/client";
+import type { Product, OrderStatus } from "@prisma/client";
 import Razorpay from "razorpay";
 
-type OrderStatus = "PENDING" | "PAID" | "PROCESSING" | "SHIPPED" | "DELIVERED" | "CANCELLED";
+
 
 const razorpay = new Razorpay({
     key_id: process.env.RAZORPAY_KEY_ID!,
@@ -96,20 +97,32 @@ export async function createOrder(data: CreateOrderData) {
 
 import { SafeOrder } from "@/lib/types";
 
-// ... previous imports ...
+// Define the type for the order with its relations
+type OrderWithItems = Prisma.OrderGetPayload<{
+    include: {
+        items: {
+            include: {
+                product: true;
+            };
+        };
+        user: true;
+    };
+}>;
 
 // Helper to serialize order data
-const serializeOrder = (order: any): SafeOrder => ({
-    ...order,
-    total: Number(order.total),
-    items: order.items?.map((item: any) => ({
-        ...item,
-        product: {
-            ...item.product,
-            price: Number(item.product.price),
-        },
-    })),
-});
+const serializeOrder = (order: Omit<OrderWithItems, "user"> & { user?: OrderWithItems["user"] }): SafeOrder => {
+    return {
+        ...order,
+        total: Number(order.total),
+        items: order.items.map((item) => ({
+            ...item,
+            product: {
+                ...item.product,
+                price: Number(item.product.price),
+            },
+        })),
+    };
+};
 
 export async function verifyPayment(
     orderId: string,
