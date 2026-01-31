@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { auth } from "@/lib/auth";
-import { Prisma } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
 import type { Product, OrderStatus } from "@prisma/client";
 import Razorpay from "razorpay";
 
