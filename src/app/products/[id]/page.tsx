@@ -9,6 +9,7 @@ import { ArrowLeft, ShoppingCart, Heart, Share2, Minus, Plus, Check } from "luci
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
 import { formatPrice, getFabricLabel, getCountLabel } from "@/lib/utils";
+import { toast } from "sonner";
 
 // Demo product data
 const demoProducts: Record<string, any> = {
@@ -44,16 +45,15 @@ export default function ProductDetailPage() {
     }
 
     const handleAddToCart = () => {
-        for (let i = 0; i < quantity; i++) {
-            addItem({
-                productId: product.id,
-                name: product.name,
-                price: product.price,
-                image: product.images[0],
-                fabricType: product.fabricType,
-                fabricCount: product.fabricCount,
-            });
-        }
+        addItem({
+            productId: product.id,
+            name: product.name,
+            price: product.price,
+            image: product.images[0],
+            fabricType: product.fabricType,
+            fabricCount: product.fabricCount,
+        }, quantity);
+        toast.success(`${product.name} added to cart`);
         setIsAdded(true);
         setTimeout(() => setIsAdded(false), 2000);
     };

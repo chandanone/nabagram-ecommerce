@@ -7,6 +7,7 @@ import { ProductCard, ProductCardSkeleton } from "@/components/products/product-
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
 import { useSearchParams, useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 // Demo products
 const demoProducts = [
@@ -68,6 +69,7 @@ function ProductsContent() {
             fabricType: product.fabricType,
             fabricCount: product.fabricCount,
         });
+        toast.success(`${product.name} added to cart`);
     };
 
     return (

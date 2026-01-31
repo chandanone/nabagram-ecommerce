@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useSession } from "next-auth/react";
 import { LoginModal } from "@/components/auth/login-modal";
 import { SignOutButton } from "@/components/auth/sign-out-button";
+import { useCart } from "@/lib/cart";
 
 const navLinks = [
     { href: "/", label: "Home" },
@@ -20,7 +21,18 @@ export function Header() {
     const [isOpen, setIsOpen] = React.useState(false);
     const [isScrolled, setIsScrolled] = React.useState(false);
     const [showLogin, setShowLogin] = React.useState(false);
+    const [mounted, setMounted] = React.useState(false);
+    const [count, setCount] = React.useState(0);
     const { data: session } = useSession();
+    const items = useCart((state) => state.items);
+
+    React.useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    React.useEffect(() => {
+        setCount(items.reduce((total, item) => total + item.quantity, 0));
+    }, [items]);
 
     React.useEffect(() => {
         const handleScroll = () => {
@@ -80,9 +92,11 @@ export function Header() {
                             <Link href="/cart">
                                 <Button variant="ghost" size="icon" className="relative">
                                     <ShoppingBag className="h-5 w-5" />
-                                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-[var(--deep-saffron)] text-white text-xs rounded-full flex items-center justify-center">
-                                        0
-                                    </span>
+                                    {mounted && count > 0 && (
+                                        <span className="absolute -top-1 -right-1 w-5 h-5 bg-[var(--deep-saffron)] text-white text-xs rounded-full flex items-center justify-center">
+                                            {count}
+                                        </span>
+                                    )}
                                 </Button>
                             </Link>
 
