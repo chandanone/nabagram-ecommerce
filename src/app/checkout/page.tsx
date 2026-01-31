@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
@@ -66,7 +66,9 @@ export default function CheckoutPage() {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const subtotal = getTotalPrice();
+    const subtotal = useMemo(() => {
+        return items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    }, [items]);
     const tax = subtotal * 0.05;
     const total = subtotal + tax;
 

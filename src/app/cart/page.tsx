@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
@@ -10,13 +10,19 @@ import { useCart } from "@/lib/cart";
 import { formatPrice, getFabricLabel } from "@/lib/utils";
 
 export default function CartPage() {
-    const { items, removeItem, updateQuantity, getTotalPrice } = useCart();
     const [mounted, setMounted] = useState(false);
+    const { items, removeItem, updateQuantity } = useCart();
 
-    // Handle hydration
-    useState(() => {
+    useEffect(() => {
         setMounted(true);
-    });
+    }, []);
+
+    const subtotal = useMemo(() => {
+        return items.reduce((total, item) => total + item.price * item.quantity, 0);
+    }, [items]);
+
+    const tax = subtotal * 0.05;
+    const total = subtotal + tax;
 
     if (!mounted) {
         return null;
@@ -137,7 +143,7 @@ export default function CartPage() {
                             <div className="space-y-4 mb-6">
                                 <div className="flex justify-between text-[var(--muted)]">
                                     <span>Subtotal</span>
-                                    <span>{formatPrice(getTotalPrice())}</span>
+                                    <span>{formatPrice(subtotal)}</span>
                                 </div>
                                 <div className="flex justify-between text-[var(--muted)]">
                                     <span>Shipping</span>
@@ -145,14 +151,14 @@ export default function CartPage() {
                                 </div>
                                 <div className="flex justify-between text-[var(--muted)]">
                                     <span>Tax (GST 5%)</span>
-                                    <span>{formatPrice(getTotalPrice() * 0.05)}</span>
+                                    <span>{formatPrice(tax)}</span>
                                 </div>
                             </div>
 
                             <div className="border-t border-[var(--warm-gray)]/20 pt-4 mb-6">
                                 <div className="flex justify-between text-lg font-bold text-[var(--silk-indigo)]">
                                     <span>Total</span>
-                                    <span>{formatPrice(getTotalPrice() * 1.05)}</span>
+                                    <span>{formatPrice(total)}</span>
                                 </div>
                             </div>
 
