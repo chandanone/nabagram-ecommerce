@@ -2,23 +2,10 @@
 
 import { prisma } from "@/lib/prisma";
 import type { Prisma } from "@prisma/client";
-import { SafeProduct } from "@/lib/types";
+import { SafeProduct, FabricType, ProductFilters } from "@/lib/types";
+import { FABRIC_TYPES } from "@/lib/constants";
 
-export const FABRIC_TYPES = {
-    MUSLIN: "MUSLIN",
-    SILK_SAREE: "SILK_SAREE",
-    SILK_THAN: "SILK_THAN"
-} as const;
 
-export type FabricType = (typeof FABRIC_TYPES)[keyof typeof FABRIC_TYPES];
-
-export interface ProductFilters {
-    type?: FabricType | string;
-    count?: string;
-    minPrice?: number;
-    maxPrice?: number;
-    search?: string;
-}
 
 export async function getProducts(filters: ProductFilters = {}): Promise<SafeProduct[]> {
     const where: Prisma.ProductWhereInput = {};
