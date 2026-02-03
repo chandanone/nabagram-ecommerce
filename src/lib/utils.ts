@@ -28,3 +28,9 @@ export function getCountLabel(count: number | null): string {
     if (!count) return "";
     return `${count}s Count`;
 }
+
+export function getOptimizedImageUrl(url: string): string {
+    if (!url || !url.includes('cloudinary')) return url;
+    if (url.includes('f_webp')) return url;
+    return url.replace('/upload/', '/upload/f_webp,q_auto/');
+}

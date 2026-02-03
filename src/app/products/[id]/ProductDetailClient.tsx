@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, ShoppingCart, Heart, Share2, Minus, Plus, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
-import { formatPrice, getFabricLabel, getCountLabel } from "@/lib/utils";
+import { formatPrice, getFabricLabel, getCountLabel, getOptimizedImageUrl } from "@/lib/utils";
 import { toast } from "sonner";
 import { SafeProduct } from "@/lib/types";
 import Link from "next/link";
@@ -58,7 +58,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                     >
                         <div className="aspect-[4/5] relative rounded-2xl overflow-hidden mb-4 shadow-xl">
                             <Image
-                                src={product.images[selectedImage]}
+                                src={getOptimizedImageUrl(product.images[selectedImage])}
                                 alt={product.name}
                                 fill
                                 className="object-cover"
@@ -67,7 +67,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                         </div>
                         {product.images.length > 1 && (
                             <div className="flex gap-4">
-                                {product.images.map((image, index) => (
+                                {product.images.map((image: string, index: number) => (
                                     <button
                                         key={index}
                                         onClick={() => setSelectedImage(index)}
@@ -77,7 +77,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                                             }`}
                                     >
                                         <Image
-                                            src={image}
+                                            src={getOptimizedImageUrl(image)}
                                             alt={`${product.name} view ${index + 1}`}
                                             fill
                                             className="object-cover"

@@ -14,12 +14,12 @@ import { Label } from "@/components/ui/label";
 import { createProduct, updateProduct } from "@/actions/products";
 import { toast } from "sonner";
 import { Loader2, Plus, Trash2 } from "lucide-react";
+import { formatPrice, getFabricLabel, getCountLabel, getOptimizedImageUrl } from "@/lib/utils";
+import { FABRIC_TYPES } from "@/lib/constants";
 import { SafeProduct, FabricType } from "@/lib/types";
+import { CldUploadWidget } from "next-cloudinary";
 
-// Define possible fabric types locally to avoid importing from @prisma/client in client components
-// This fixes the 'Can't resolve .prisma/client/index-browser' build error
-const FABRIC_TYPES = ["MUSLIN", "SILK_SAREE", "SILK_THAN"] as const;
-type LocalFabricType = (typeof FABRIC_TYPES)[number];
+type LocalFabricType = keyof typeof FABRIC_TYPES;
 
 interface ProductModalProps {
     open: boolean;
@@ -49,7 +49,7 @@ export function ProductModal({ open, onOpenChange, product, onSuccess }: Product
         fabricCount: "",
         stock: "0",
         featured: false,
-        images: [""]
+        images: []
     });
 
     useEffect(() => {
@@ -62,7 +62,7 @@ export function ProductModal({ open, onOpenChange, product, onSuccess }: Product
                 fabricCount: product.fabricCount?.toString() || "",
                 stock: product.stock?.toString() || "0",
                 featured: product.featured || false,
-                images: product.images?.length > 0 ? product.images : [""]
+                images: product.images || []
             });
         } else {
             setFormData({
@@ -73,7 +73,7 @@ export function ProductModal({ open, onOpenChange, product, onSuccess }: Product
                 fabricCount: "",
                 stock: "0",
                 featured: false,
-                images: [""]
+                images: []
             });
         }
     }, [product, open]);
@@ -111,19 +111,9 @@ export function ProductModal({ open, onOpenChange, product, onSuccess }: Product
         }
     };
 
-    const handleImageChange = (index: number, value: string) => {
-        const newImages = [...formData.images];
-        newImages[index] = value;
-        setFormData({ ...formData, images: newImages });
-    };
-
-    const addImageField = () => {
-        setFormData({ ...formData, images: [...formData.images, ""] });
-    };
-
     const removeImageField = (index: number) => {
         const newImages = formData.images.filter((_, i) => i !== index);
-        setFormData({ ...formData, images: newImages.length === 0 ? [""] : newImages });
+        setFormData({ ...formData, images: newImages });
     };
 
     return (
@@ -162,7 +152,7 @@ export function ProductModal({ open, onOpenChange, product, onSuccess }: Product
                                 onChange={(e) => setFormData({ ...formData, fabricType: e.target.value as FabricType })}
                                 className="w-full h-10 px-3 rounded-md border border-[var(--warm-gray)]/30 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[var(--deep-saffron)]"
                             >
-                                {FABRIC_TYPES.map((type) => (
+                                {Object.keys(FABRIC_TYPES).map((type) => (
                                     <option key={type} value={type}>
                                         {type.replace("_", " ")}
                                     </option>
@@ -213,35 +203,62 @@ export function ProductModal({ open, onOpenChange, product, onSuccess }: Product
                     </div>
 
                     <div className="space-y-4">
-                        <Label>Images (URLs)</Label>
-                        {formData.images.map((url, index) => (
-                            <div key={index} className="flex gap-2">
-                                <Input
-                                    value={url}
-                                    onChange={(e) => handleImageChange(index, e.target.value)}
-                                    placeholder="https://example.com/image.jpg"
-                                    required={index === 0}
-                                />
+                        <Label>Images</Label>
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            {formData.images.filter(url => url !== "").map((url, index) => (
+                                <div key={index} className="relative group aspect-square rounded-lg overflow-hidden border">
+                                    <img
+                                        src={getOptimizedImageUrl(url)}
+                                        alt={`Product ${index + 1}`}
+                                        className="object-cover w-full h-full"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => removeImageField(index)}
+                                        className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                    >
+                                        <Trash2 className="h-4 w-4" />
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+
+                        <CldUploadWidget
+                            uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
+                            onSuccess={(result: any) => {
+                                console.log("Upload Result:", result);
+                                if (result.info && typeof result.info !== "string") {
+                                    const url = result.info.secure_url;
+                                    // Optimization: use f_auto,q_auto for efficiency
+                                    const optimizedUrl = url.replace('/upload/', '/upload/f_auto,q_auto/');
+
+                                    setFormData(prev => ({
+                                        ...prev,
+                                        images: [...prev.images, optimizedUrl]
+                                    }));
+                                }
+                            }}
+                            options={{
+                                cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+                                sources: ["local", "camera", "google_drive"],
+                                multiple: true,
+                                maxFiles: 10,
+                                folder: "assets/products",
+                                resourceType: "image",
+                            }}
+                        >
+                            {({ open }) => (
                                 <Button
                                     type="button"
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => removeImageField(index)}
-                                    className="text-red-500"
+                                    variant="outline"
+                                    onClick={() => open()}
+                                    className="w-full h-24 border-dashed border-2 flex flex-col gap-2"
                                 >
-                                    <Trash2 className="h-4 w-4" />
+                                    <Plus className="h-6 w-6" />
+                                    <span>Upload Images (from Gallery/Camera)</span>
                                 </Button>
-                            </div>
-                        ))}
-                        <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={addImageField}
-                            className="gap-2"
-                        >
-                            <Plus className="h-4 w-4" /> Add Image URL
-                        </Button>
+                            )}
+                        </CldUploadWidget>
                     </div>
 
                     <DialogFooter>

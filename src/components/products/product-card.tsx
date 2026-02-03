@@ -6,7 +6,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ShoppingCart, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { formatPrice, getFabricLabel, getCountLabel } from "@/lib/utils";
+import { formatPrice, getFabricLabel, getCountLabel, getOptimizedImageUrl } from "@/lib/utils";
 
 interface ProductCardProps {
     id: string;
@@ -39,7 +39,7 @@ export function ProductCard({
                 {/* Image Container */}
                 <div className="relative aspect-[3/4] overflow-hidden">
                     <Image
-                        src={image}
+                        src={getOptimizedImageUrl(image)}
                         alt={name}
                         fill
                         className="object-cover transition-transform duration-700 group-hover:scale-110"
