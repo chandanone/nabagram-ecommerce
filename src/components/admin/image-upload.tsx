@@ -1,10 +1,18 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Plus, Trash2, Loader2, Image as ImageIcon } from "lucide-react";
+import { Plus, Trash2, Loader2, Image as ImageIcon, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { getOptimizedImageUrl, convertToWebP } from "@/lib/utils";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+    DialogDescription,
+    DialogFooter,
+} from "@/components/ui/dialog";
 
 interface ImageUploadProps {
     value: string[];
@@ -14,27 +22,34 @@ interface ImageUploadProps {
 
 export function ImageUpload({ value, onChange, onRemove }: ImageUploadProps) {
     const [isUploading, setIsUploading] = useState(false);
+    const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+    const [showConfirm, setShowConfirm] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const onUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = e.target.files;
-        if (!files || files.length === 0) return;
-
+    const processAndUpload = async (files: File[], forceOptimize = false) => {
         setIsUploading(true);
         const uploadedUrls: string[] = [];
 
+        // Settings from localStorage
+        const savedSettings = localStorage.getItem("admin-upload-settings");
+        const settings = savedSettings ? JSON.parse(savedSettings) : { autoOptimize: true, threshold: 5 };
+        const thresholdInBytes = settings.threshold * 1024 * 1024;
+
         try {
             for (let i = 0; i < files.length; i++) {
-                const file = files[i];
+                let fileToUpload = files[i];
+                const isLarge = fileToUpload.size > thresholdInBytes;
 
-                // Convert to WebP client-side
-                const webpBlob = await convertToWebP(file);
-                const webpFile = new File([webpBlob], file.name.replace(/\.[^/.]+$/, "") + ".webp", {
-                    type: "image/webp",
-                });
+                if (isLarge && (settings.autoOptimize || forceOptimize)) {
+                    // Optimize
+                    const blob = await convertToWebP(fileToUpload, 0.95);
+                    fileToUpload = new File([blob], fileToUpload.name.replace(/\.[^/.]+$/, "") + ".webp", {
+                        type: "image/webp",
+                    });
+                }
 
                 const formData = new FormData();
-                formData.append("file", webpFile);
+                formData.append("file", fileToUpload);
                 formData.append("upload_preset", process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "");
                 formData.append("folder", "assets/products");
 
@@ -46,25 +61,48 @@ export function ImageUpload({ value, onChange, onRemove }: ImageUploadProps) {
                     }
                 );
 
-                if (!response.ok) {
-                    throw new Error("Upload failed");
-                }
-
+                if (!response.ok) throw new Error("Upload failed");
                 const data = await response.json();
                 uploadedUrls.push(data.secure_url);
             }
 
             onChange([...value, ...uploadedUrls]);
-            toast.success(`${uploadedUrls.length} image(s) uploaded successfully`);
+            toast.success(`${uploadedUrls.length} images(s) handled successfully`);
         } catch (error) {
-            console.error("Upload error:", error);
+            console.error(error);
             toast.error("Failed to upload image(s)");
         } finally {
             setIsUploading(false);
-            if (fileInputRef.current) {
-                fileInputRef.current.value = "";
+            if (fileInputRef.current) fileInputRef.current.value = "";
+        }
+    };
+
+    const onUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(e.target.files || []);
+        if (files.length === 0) return;
+
+        // Settings
+        const savedSettings = localStorage.getItem("admin-upload-settings");
+        const settings = savedSettings ? JSON.parse(savedSettings) : { autoOptimize: true, threshold: 5 };
+        const thresholdInBytes = settings.threshold * 1024 * 1024;
+
+        const hasLargeFiles = files.some(f => f.size > thresholdInBytes);
+
+        if (hasLargeFiles && !settings.autoOptimize) {
+            // Check last prompt date
+            const lastPrompt = localStorage.getItem("last-optimization-prompt");
+            const oneWeek = 7 * 24 * 60 * 60 * 1000;
+            const shouldPrompt = !lastPrompt || (Date.now() - parseInt(lastPrompt) > oneWeek);
+
+            if (shouldPrompt) {
+                setPendingFiles(files);
+                setShowConfirm(true);
+                localStorage.setItem("last-optimization-prompt", Date.now().toString());
+                return;
             }
         }
+
+        processAndUpload(files);
     };
 
     return (
@@ -122,6 +160,40 @@ export function ImageUpload({ value, onChange, onRemove }: ImageUploadProps) {
                     </>
                 )}
             </Button>
+
+            <Dialog open={showConfirm} onOpenChange={setShowConfirm}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
+                            <Sparkles className="h-5 w-5 text-blue-500" />
+                            Optimize Large Images?
+                        </DialogTitle>
+                        <DialogDescription>
+                            Some of your images are large. Optimization makes them 70-80% smaller while keeping the quality sharp (WebP 95%). This saves Cloudinary storage and makes your site load faster.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="flex gap-2 sm:gap-0">
+                        <Button
+                            variant="outline"
+                            onClick={() => {
+                                setShowConfirm(false);
+                                processAndUpload(pendingFiles, false);
+                            }}
+                        >
+                            Upload Original
+                        </Button>
+                        <Button
+                            className="bg-blue-600 hover:bg-blue-700 text-white"
+                            onClick={() => {
+                                setShowConfirm(false);
+                                processAndUpload(pendingFiles, true);
+                            }}
+                        >
+                            Optimize & Upload
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }
