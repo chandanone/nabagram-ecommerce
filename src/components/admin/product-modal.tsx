@@ -17,7 +17,7 @@ import { Loader2, Plus, Trash2 } from "lucide-react";
 import { formatPrice, getFabricLabel, getCountLabel, getOptimizedImageUrl } from "@/lib/utils";
 import { FABRIC_TYPES } from "@/lib/constants";
 import { SafeProduct, FabricType } from "@/lib/types";
-import { CldUploadWidget } from "next-cloudinary";
+import { ImageUpload } from "./image-upload";
 
 type LocalFabricType = keyof typeof FABRIC_TYPES;
 
@@ -111,10 +111,6 @@ export function ProductModal({ open, onOpenChange, product, onSuccess }: Product
         }
     };
 
-    const removeImageField = (index: number) => {
-        const newImages = formData.images.filter((_, i) => i !== index);
-        setFormData({ ...formData, images: newImages });
-    };
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -202,63 +198,16 @@ export function ProductModal({ open, onOpenChange, product, onSuccess }: Product
                         />
                     </div>
 
-                    <div className="space-y-4">
-                        <Label>Images</Label>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            {formData.images.filter(url => url !== "").map((url, index) => (
-                                <div key={index} className="relative group aspect-square rounded-lg overflow-hidden border">
-                                    <img
-                                        src={getOptimizedImageUrl(url)}
-                                        alt={`Product ${index + 1}`}
-                                        className="object-cover w-full h-full"
-                                    />
-                                    <button
-                                        type="button"
-                                        onClick={() => removeImageField(index)}
-                                        className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                                    >
-                                        <Trash2 className="h-4 w-4" />
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
-
-                        <CldUploadWidget
-                            uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET}
-                            onSuccess={(result: any) => {
-                                console.log("Upload Result:", result);
-                                if (result.info && typeof result.info !== "string") {
-                                    const url = result.info.secure_url;
-                                    // Optimization: use f_auto,q_auto for efficiency
-                                    const optimizedUrl = url.replace('/upload/', '/upload/f_auto,q_auto/');
-
-                                    setFormData(prev => ({
-                                        ...prev,
-                                        images: [...prev.images, optimizedUrl]
-                                    }));
-                                }
-                            }}
-                            options={{
-                                cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-                                sources: ["local", "camera", "google_drive"],
-                                multiple: true,
-                                maxFiles: 10,
-                                folder: "assets/products",
-                                resourceType: "image",
-                            }}
-                        >
-                            {({ open }) => (
-                                <Button
-                                    type="button"
-                                    variant="outline"
-                                    onClick={() => open()}
-                                    className="w-full h-24 border-dashed border-2 flex flex-col gap-2"
-                                >
-                                    <Plus className="h-6 w-6" />
-                                    <span>Upload Images (from Gallery/Camera)</span>
-                                </Button>
-                            )}
-                        </CldUploadWidget>
+                    <div className="space-y-2">
+                        <Label>Product Images</Label>
+                        <ImageUpload
+                            value={formData.images}
+                            onChange={(urls: string[]) => setFormData({ ...formData, images: urls })}
+                            onRemove={(url: string) => setFormData({
+                                ...formData,
+                                images: formData.images.filter((img) => img !== url)
+                            })}
+                        />
                     </div>
 
                     <DialogFooter>
