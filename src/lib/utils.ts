@@ -31,6 +31,6 @@ export function getCountLabel(count: number | null): string {
 
 export function getOptimizedImageUrl(url: string): string {
     if (!url || !url.includes('cloudinary')) return url;
-    if (url.includes('f_webp')) return url;
-    return url.replace('/upload/', '/upload/f_webp,q_auto/');
+    if (url.includes('f_auto') || url.includes('f_webp')) return url;
+    return url.replace('/upload/', '/upload/f_auto,q_auto/');
 }
