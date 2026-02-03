@@ -4,24 +4,25 @@ import ProductsClient from "./ProductsClient";
 import { ProductCardSkeleton } from "@/components/products/product-card";
 
 interface ProductsPageProps {
-    searchParams: {
+    searchParams: Promise<{
         type?: string;
         count?: string;
         search?: string;
-    };
+    }>;
 }
 
-async function ProductsList({ searchParams }: ProductsPageProps) {
+async function ProductsList({ searchParams }: { searchParams: Promise<any> }) {
+    const resolvedParams = await searchParams;
     const products = await getProducts({
-        type: searchParams.type,
-        count: searchParams.count,
-        search: searchParams.search,
+        type: resolvedParams.type,
+        count: resolvedParams.count,
+        search: resolvedParams.search,
     });
 
     return <ProductsClient products={products} />;
 }
 
-export default function ProductsPage({ searchParams }: ProductsPageProps) {
+export default async function ProductsPage({ searchParams }: ProductsPageProps) {
     return (
         <Suspense fallback={
             <div className="min-h-screen pt-32">

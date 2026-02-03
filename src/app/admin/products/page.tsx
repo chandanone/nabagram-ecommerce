@@ -14,7 +14,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { formatPrice, getFabricLabel, getCountLabel } from "@/lib/utils";
+import { formatPrice, getFabricLabel, getCountLabel, getOptimizedImageUrl } from "@/lib/utils";
 import { getProducts, deleteProduct } from "@/actions/products";
 import { ProductModal } from "@/components/admin/product-modal";
 import { toast } from "sonner";
@@ -166,7 +166,7 @@ export default function AdminProductsPage() {
                                                         <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
                                                             {product.images?.[0] ? (
                                                                 <Image
-                                                                    src={product.images[0]}
+                                                                    src={getOptimizedImageUrl(product.images[0])}
                                                                     alt={product.name}
                                                                     fill
                                                                     className="object-cover"

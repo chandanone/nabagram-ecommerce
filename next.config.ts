@@ -28,6 +28,11 @@ const nextConfig = {
         hostname: 'ui-avatars.com', // Add this for fallback initials
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        pathname: '/**',
+      },
     ],
   },
   reactCompiler: true,

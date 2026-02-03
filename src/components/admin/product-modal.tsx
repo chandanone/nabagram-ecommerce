@@ -14,12 +14,12 @@ import { Label } from "@/components/ui/label";
 import { createProduct, updateProduct } from "@/actions/products";
 import { toast } from "sonner";
 import { Loader2, Plus, Trash2 } from "lucide-react";
+import { formatPrice, getFabricLabel, getCountLabel, getOptimizedImageUrl } from "@/lib/utils";
+import { FABRIC_TYPES } from "@/lib/constants";
 import { SafeProduct, FabricType } from "@/lib/types";
+import { ImageUpload } from "./image-upload";
 
-// Define possible fabric types locally to avoid importing from @prisma/client in client components
-// This fixes the 'Can't resolve .prisma/client/index-browser' build error
-const FABRIC_TYPES = ["MUSLIN", "SILK_SAREE", "SILK_THAN"] as const;
-type LocalFabricType = (typeof FABRIC_TYPES)[number];
+type LocalFabricType = keyof typeof FABRIC_TYPES;
 
 interface ProductModalProps {
     open: boolean;
@@ -49,7 +49,7 @@ export function ProductModal({ open, onOpenChange, product, onSuccess }: Product
         fabricCount: "",
         stock: "0",
         featured: false,
-        images: [""]
+        images: []
     });
 
     useEffect(() => {
@@ -62,7 +62,7 @@ export function ProductModal({ open, onOpenChange, product, onSuccess }: Product
                 fabricCount: product.fabricCount?.toString() || "",
                 stock: product.stock?.toString() || "0",
                 featured: product.featured || false,
-                images: product.images?.length > 0 ? product.images : [""]
+                images: product.images || []
             });
         } else {
             setFormData({
@@ -73,7 +73,7 @@ export function ProductModal({ open, onOpenChange, product, onSuccess }: Product
                 fabricCount: "",
                 stock: "0",
                 featured: false,
-                images: [""]
+                images: []
             });
         }
     }, [product, open]);
@@ -111,20 +111,6 @@ export function ProductModal({ open, onOpenChange, product, onSuccess }: Product
         }
     };
 
-    const handleImageChange = (index: number, value: string) => {
-        const newImages = [...formData.images];
-        newImages[index] = value;
-        setFormData({ ...formData, images: newImages });
-    };
-
-    const addImageField = () => {
-        setFormData({ ...formData, images: [...formData.images, ""] });
-    };
-
-    const removeImageField = (index: number) => {
-        const newImages = formData.images.filter((_, i) => i !== index);
-        setFormData({ ...formData, images: newImages.length === 0 ? [""] : newImages });
-    };
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -162,7 +148,7 @@ export function ProductModal({ open, onOpenChange, product, onSuccess }: Product
                                 onChange={(e) => setFormData({ ...formData, fabricType: e.target.value as FabricType })}
                                 className="w-full h-10 px-3 rounded-md border border-[var(--warm-gray)]/30 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[var(--deep-saffron)]"
                             >
-                                {FABRIC_TYPES.map((type) => (
+                                {Object.keys(FABRIC_TYPES).map((type) => (
                                     <option key={type} value={type}>
                                         {type.replace("_", " ")}
                                     </option>
@@ -212,36 +198,16 @@ export function ProductModal({ open, onOpenChange, product, onSuccess }: Product
                         />
                     </div>
 
-                    <div className="space-y-4">
-                        <Label>Images (URLs)</Label>
-                        {formData.images.map((url, index) => (
-                            <div key={index} className="flex gap-2">
-                                <Input
-                                    value={url}
-                                    onChange={(e) => handleImageChange(index, e.target.value)}
-                                    placeholder="https://example.com/image.jpg"
-                                    required={index === 0}
-                                />
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={() => removeImageField(index)}
-                                    className="text-red-500"
-                                >
-                                    <Trash2 className="h-4 w-4" />
-                                </Button>
-                            </div>
-                        ))}
-                        <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={addImageField}
-                            className="gap-2"
-                        >
-                            <Plus className="h-4 w-4" /> Add Image URL
-                        </Button>
+                    <div className="space-y-2">
+                        <Label>Product Images</Label>
+                        <ImageUpload
+                            value={formData.images}
+                            onChange={(urls: string[]) => setFormData({ ...formData, images: urls })}
+                            onRemove={(url: string) => setFormData({
+                                ...formData,
+                                images: formData.images.filter((img) => img !== url)
+                            })}
+                        />
                     </div>
 
                     <DialogFooter>
