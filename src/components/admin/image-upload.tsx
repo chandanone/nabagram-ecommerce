@@ -4,7 +4,7 @@ import { useState, useRef } from "react";
 import { Plus, Trash2, Loader2, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { getOptimizedImageUrl } from "@/lib/utils";
+import { getOptimizedImageUrl, convertToWebP } from "@/lib/utils";
 
 interface ImageUploadProps {
     value: string[];
@@ -26,8 +26,15 @@ export function ImageUpload({ value, onChange, onRemove }: ImageUploadProps) {
         try {
             for (let i = 0; i < files.length; i++) {
                 const file = files[i];
+
+                // Convert to WebP client-side
+                const webpBlob = await convertToWebP(file);
+                const webpFile = new File([webpBlob], file.name.replace(/\.[^/.]+$/, "") + ".webp", {
+                    type: "image/webp",
+                });
+
                 const formData = new FormData();
-                formData.append("file", file);
+                formData.append("file", webpFile);
                 formData.append("upload_preset", process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || "");
                 formData.append("folder", "assets/products");
 
