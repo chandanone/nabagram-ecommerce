@@ -19,7 +19,8 @@ import { Link } from "@/i18n/routing";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { getTranslations } from "next-intl/server";
 
-export default async function AccountPage() {
+export default async function AccountPage({ params }: { params: { locale: string } }) {
+    const { locale } = params;
     const t = await getTranslations("Account");
     const tCommon = await getTranslations("AdminSidebar");
     const tStatus = await getTranslations("Common.status");
@@ -32,6 +33,9 @@ export default async function AccountPage() {
 
     const orders = await getOrders();
     const user = session.user;
+
+    const priceLocale = locale === 'bn' ? 'bn-IN' : 'en-IN';
+    const dateLocale = locale === 'bn' ? 'bn-BD' : undefined;
 
     return (
         <div className="min-h-screen bg-[var(--cream)]/30 pt-28 pb-20">
@@ -71,16 +75,15 @@ export default async function AccountPage() {
                                 </div>
 
                                 <div className="mt-8 pt-6 border-t border-[var(--warm-gray)]/10 space-y-3">
-                                    <SignOutButton className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50" />
-
                                     {user.role === "ADMIN" && (
                                         <Link href="/admin">
-                                            <Button variant="ghost" className="w-full justify-start gap-3 mt-2">
+                                            <Button variant="ghost" className="w-full justify-start gap-3 mb-2">
                                                 <Shield className="h-4 w-4" />
                                                 {tCommon("panel")}
                                             </Button>
                                         </Link>
                                     )}
+                                    <SignOutButton className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50" />
                                 </div>
                             </CardContent>
                         </Card>
@@ -93,7 +96,7 @@ export default async function AccountPage() {
                                 {t("orderHistory")}
                             </h2>
                             <span className="text-sm text-[var(--muted)]">
-                                {t("ordersTotal", { count: orders.length })}
+                                {t("ordersTotal", { count: locale === 'bn' ? orders.length.toLocaleString('bn-BD') : orders.length })}
                             </span>
                         </div>
 
@@ -125,7 +128,7 @@ export default async function AccountPage() {
                                                             <div className="flex items-center gap-2 text-[var(--silk-indigo)]">
                                                                 <Calendar className="h-3.5 w-3.5 text-[var(--deep-saffron)]" />
                                                                 <span className="font-bold text-sm">
-                                                                    {new Date(order.createdAt).toLocaleDateString(undefined, {
+                                                                    {new Date(order.createdAt).toLocaleDateString(dateLocale, {
                                                                         day: 'numeric',
                                                                         month: 'short',
                                                                         year: 'numeric'
@@ -155,7 +158,7 @@ export default async function AccountPage() {
                                                             ))}
                                                             {(order.items || []).length > 3 && (
                                                                 <div className="relative w-12 h-14 rounded-xl border-2 border-white bg-[var(--cotton-white)] flex items-center justify-center text-[10px] font-black text-[var(--silk-indigo)] shadow-md">
-                                                                    +{(order.items || []).length - 3}
+                                                                    +{locale === 'bn' ? ((order.items || []).length - 3).toLocaleString('bn-BD') : (order.items || []).length - 3}
                                                                 </div>
                                                             )}
                                                         </div>
@@ -164,12 +167,12 @@ export default async function AccountPage() {
                                                                 {(order.items || []).map(item => item.product.name).join(', ')}
                                                             </p>
                                                             <p className="text-xs text-[var(--muted)] font-medium">
-                                                                {t("items", { count: (order.items || []).length })}
+                                                                {t("items", { count: locale === 'bn' ? (order.items || []).length.toLocaleString('bn-BD') : (order.items || []).length })}
                                                             </p>
                                                         </div>
                                                         <div className="text-right">
                                                             <p className="text-lg font-black text-[var(--silk-indigo)] tabular-nums">
-                                                                {formatPrice(order.total)}
+                                                                {formatPrice(order.total, priceLocale)}
                                                             </p>
                                                         </div>
                                                     </div>

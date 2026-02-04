@@ -4,7 +4,7 @@ import { useState, useRef } from "react";
 import { Plus, Trash2, Loader2, Image as ImageIcon, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { getOptimizedImageUrl, convertToWebP } from "@/lib/utils";
+import { getOptimizedImageUrl, convertToWebP, toBengaliDigits } from "@/lib/utils";
 import {
     Dialog,
     DialogContent,
@@ -13,6 +13,7 @@ import {
     DialogDescription,
     DialogFooter,
 } from "@/components/ui/dialog";
+import { useTranslations, useLocale } from "next-intl";
 
 interface ImageUploadProps {
     value: string[];
@@ -21,6 +22,8 @@ interface ImageUploadProps {
 }
 
 export function ImageUpload({ value, onChange, onRemove }: ImageUploadProps) {
+    const t = useTranslations("AdminProducts.upload");
+    const locale = useLocale();
     const [isUploading, setIsUploading] = useState(false);
     const [pendingFiles, setPendingFiles] = useState<File[]>([]);
     const [showConfirm, setShowConfirm] = useState(false);
@@ -67,10 +70,10 @@ export function ImageUpload({ value, onChange, onRemove }: ImageUploadProps) {
             }
 
             onChange([...value, ...uploadedUrls]);
-            toast.success(`${uploadedUrls.length} images(s) handled successfully`);
+            toast.success(t("success", { count: locale === 'bn' ? toBengaliDigits(uploadedUrls.length) : uploadedUrls.length }));
         } catch (error) {
             console.error(error);
-            toast.error("Failed to upload image(s)");
+            toast.error(t("failed"));
         } finally {
             setIsUploading(false);
             if (fileInputRef.current) fileInputRef.current.value = "";
@@ -146,16 +149,16 @@ export function ImageUpload({ value, onChange, onRemove }: ImageUploadProps) {
                 {isUploading ? (
                     <>
                         <Loader2 className="h-6 w-6 animate-spin text-[var(--deep-saffron)]" />
-                        <span className="text-sm font-medium">Uploading images...</span>
+                        <span className="text-sm font-medium">{t("uploading")}</span>
                     </>
                 ) : (
                     <>
                         <Plus className="h-6 w-6 text-[var(--deep-saffron)]" />
                         <span className="text-sm font-medium text-gray-600">
-                            Add Images (Gallery/Camera)
+                            {t("add")}
                         </span>
                         <span className="text-xs text-gray-400">
-                            You can select multiple images
+                            {t("multiple")}
                         </span>
                     </>
                 )}
@@ -166,10 +169,10 @@ export function ImageUpload({ value, onChange, onRemove }: ImageUploadProps) {
                     <DialogHeader>
                         <DialogTitle className="flex items-center gap-2">
                             <Sparkles className="h-5 w-5 text-blue-500" />
-                            Optimize Large Images?
+                            {t("optimizeTitle")}
                         </DialogTitle>
                         <DialogDescription>
-                            Some of your images are large. Optimization makes them 70-80% smaller while keeping the quality sharp (WebP 95%). This saves Cloudinary storage and makes your site load faster.
+                            {t("optimizeDesc")}
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter className="flex gap-2 sm:gap-0">
@@ -180,7 +183,7 @@ export function ImageUpload({ value, onChange, onRemove }: ImageUploadProps) {
                                 processAndUpload(pendingFiles, false);
                             }}
                         >
-                            Upload Original
+                            {t("original")}
                         </Button>
                         <Button
                             className="bg-blue-600 hover:bg-blue-700 text-white"
@@ -189,7 +192,7 @@ export function ImageUpload({ value, onChange, onRemove }: ImageUploadProps) {
                                 processAndUpload(pendingFiles, true);
                             }}
                         >
-                            Optimize & Upload
+                            {t("optimize")}
                         </Button>
                     </DialogFooter>
                 </DialogContent>

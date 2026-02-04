@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import {
@@ -24,6 +24,7 @@ import { SafeProduct } from "@/lib/types";
 export default function AdminProductsPage() {
     const t = useTranslations("AdminProducts");
     const tCommon = useTranslations("Common");
+    const locale = useLocale();
     const [products, setProducts] = useState<SafeProduct[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [search, setSearch] = useState("");
@@ -193,13 +194,13 @@ export default function AdminProductsPage() {
                                                         {getFabricLabel(product.fabricType)}
                                                     </span>
                                                 </td>
-                                                <td className="p-4 text-right font-medium">{formatPrice(product.price)}</td>
+                                                <td className="p-4 text-right font-medium">{formatPrice(product.price, locale === 'bn' ? 'bn-IN' : 'en-IN')}</td>
                                                 <td className="p-4 text-center">
                                                     <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${product.stock < 5 ? "bg-red-100 text-red-700" :
                                                         product.stock < 10 ? "bg-yellow-100 text-yellow-700" :
                                                             "bg-green-100 text-green-700"
                                                         }`}>
-                                                        {product.stock}
+                                                        {locale === 'bn' ? product.stock.toLocaleString('bn-BD') : product.stock}
                                                     </span>
                                                 </td>
                                                 <td className="p-4 text-center">

@@ -14,12 +14,11 @@ import { Label } from "@/components/ui/label";
 import { createProduct, updateProduct } from "@/actions/products";
 import { toast } from "sonner";
 import { Loader2, Plus, Trash2 } from "lucide-react";
-import { formatPrice, getFabricLabel, getCountLabel, getOptimizedImageUrl } from "@/lib/utils";
+import { fromBengaliDigits, toBengaliDigits } from "@/lib/utils";
 import { FABRIC_TYPES } from "@/lib/constants";
 import { SafeProduct, FabricType } from "@/lib/types";
 import { ImageUpload } from "./image-upload";
-
-type LocalFabricType = keyof typeof FABRIC_TYPES;
+import { useTranslations, useLocale } from "next-intl";
 
 interface ProductModalProps {
     open: boolean;
@@ -40,6 +39,9 @@ interface ProductFormData {
 }
 
 export function ProductModal({ open, onOpenChange, product, onSuccess }: ProductModalProps) {
+    const t = useTranslations("AdminProducts.modal");
+    const tCommon = useTranslations("Common");
+    const locale = useLocale();
     const [isLoading, setIsLoading] = useState(false);
     const [formData, setFormData] = useState<ProductFormData>({
         name: "",
@@ -83,45 +85,53 @@ export function ProductModal({ open, onOpenChange, product, onSuccess }: Product
         setIsLoading(true);
 
         try {
+            // Convert to standard digits before parsing
+            const priceVal = locale === 'bn' ? fromBengaliDigits(formData.price) : formData.price;
+            const stockVal = locale === 'bn' ? fromBengaliDigits(formData.stock) : formData.stock;
+            const countVal = locale === 'bn' ? fromBengaliDigits(formData.fabricCount) : formData.fabricCount;
+
             const data = {
                 name: formData.name,
                 description: formData.description,
-                price: parseFloat(formData.price),
+                price: parseFloat(priceVal) || 0,
                 fabricType: formData.fabricType,
-                fabricCount: formData.fabricCount ? parseInt(formData.fabricCount) : undefined,
-                stock: parseInt(formData.stock),
+                fabricCount: countVal ? parseInt(countVal) : undefined,
+                stock: parseInt(stockVal) || 0,
                 featured: formData.featured,
                 images: formData.images.filter(img => img.trim() !== "")
             };
 
             if (product) {
                 await updateProduct(product.id, data);
-                toast.success("Product updated successfully");
+                toast.success(t("successUpdate"));
             } else {
                 await createProduct(data);
-                toast.success("Product created successfully");
+                toast.success(t("successCreate"));
             }
             onSuccess();
             onOpenChange(false);
         } catch (error) {
             console.error(error);
-            toast.error("Something went wrong");
+            toast.error(t("error"));
         } finally {
             setIsLoading(false);
         }
     };
 
+    const handleNumericChange = (field: keyof ProductFormData, value: string) => {
+        setFormData({ ...formData, [field]: value });
+    };
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
-                    <DialogTitle>{product ? "Edit Product" : "Add New Product"}</DialogTitle>
+                    <DialogTitle>{product ? t("edit") : t("addNew")}</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit} className="space-y-6 py-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                            <Label htmlFor="name">Product Name</Label>
+                            <Label htmlFor="name">{t("name")}</Label>
                             <Input
                                 id="name"
                                 value={formData.name}
@@ -130,18 +140,21 @@ export function ProductModal({ open, onOpenChange, product, onSuccess }: Product
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="price">Price (₹)</Label>
+                            <Label htmlFor="price">{t("price")}</Label>
                             <Input
                                 id="price"
-                                type="number"
-                                step="0.01"
-                                value={formData.price}
-                                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                                type="text"
+                                inputMode="decimal"
+                                value={locale === 'bn' ? toBengaliDigits(formData.price) : formData.price}
+                                onChange={(e) => {
+                                    const val = locale === 'bn' ? fromBengaliDigits(e.target.value) : e.target.value;
+                                    setFormData({ ...formData, price: val.replace(/[^0-9.]/g, '') });
+                                }}
                                 required
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="fabricType">Fabric Type</Label>
+                            <Label htmlFor="fabricType">{t("fabricType")}</Label>
                             <select
                                 id="fabricType"
                                 value={formData.fabricType}
@@ -150,28 +163,36 @@ export function ProductModal({ open, onOpenChange, product, onSuccess }: Product
                             >
                                 {Object.keys(FABRIC_TYPES).map((type) => (
                                     <option key={type} value={type}>
-                                        {type.replace("_", " ")}
+                                        {tCommon(`fabric.${type}`)}
                                     </option>
                                 ))}
                             </select>
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="fabricCount">Fabric Count (Optional)</Label>
+                            <Label htmlFor="fabricCount">{t("fabricCount")}</Label>
                             <Input
                                 id="fabricCount"
-                                type="number"
-                                value={formData.fabricCount}
-                                onChange={(e) => setFormData({ ...formData, fabricCount: e.target.value })}
-                                placeholder="e.g. 60, 80, 100"
+                                type="text"
+                                inputMode="numeric"
+                                value={locale === 'bn' ? toBengaliDigits(formData.fabricCount) : formData.fabricCount}
+                                onChange={(e) => {
+                                    const val = locale === 'bn' ? fromBengaliDigits(e.target.value) : e.target.value;
+                                    setFormData({ ...formData, fabricCount: val.replace(/\D/g, '') });
+                                }}
+                                placeholder={t("fabricCountPlaceholder")}
                             />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="stock">Stock Quantity</Label>
+                            <Label htmlFor="stock">{t("stock")}</Label>
                             <Input
                                 id="stock"
-                                type="number"
-                                value={formData.stock}
-                                onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                                type="text"
+                                inputMode="numeric"
+                                value={locale === 'bn' ? toBengaliDigits(formData.stock) : formData.stock}
+                                onChange={(e) => {
+                                    const val = locale === 'bn' ? fromBengaliDigits(e.target.value) : e.target.value;
+                                    setFormData({ ...formData, stock: val.replace(/\D/g, '') });
+                                }}
                                 required
                             />
                         </div>
@@ -183,12 +204,12 @@ export function ProductModal({ open, onOpenChange, product, onSuccess }: Product
                                 onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
                                 className="h-4 w-4 rounded border-gray-300 text-[var(--deep-saffron)] focus:ring-[var(--deep-saffron)]"
                             />
-                            <Label htmlFor="featured">Featured Product</Label>
+                            <Label htmlFor="featured">{t("featured")}</Label>
                         </div>
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="description">Description</Label>
+                        <Label htmlFor="description">{t("description")}</Label>
                         <textarea
                             id="description"
                             value={formData.description}
@@ -199,7 +220,7 @@ export function ProductModal({ open, onOpenChange, product, onSuccess }: Product
                     </div>
 
                     <div className="space-y-2">
-                        <Label>Product Images</Label>
+                        <Label>{t("images")}</Label>
                         <ImageUpload
                             value={formData.images}
                             onChange={(urls: string[]) => setFormData({ ...formData, images: urls })}
@@ -216,7 +237,7 @@ export function ProductModal({ open, onOpenChange, product, onSuccess }: Product
                             variant="outline"
                             onClick={() => onOpenChange(false)}
                         >
-                            Cancel
+                            {t("cancel")}
                         </Button>
                         <Button
                             type="submit"
@@ -224,7 +245,7 @@ export function ProductModal({ open, onOpenChange, product, onSuccess }: Product
                             className="bg-[var(--deep-saffron)] hover:bg-[var(--deep-saffron)]/90 text-white"
                         >
                             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            {product ? "Update Product" : "Create Product"}
+                            {isLoading ? t("saving") : (product ? t("edit") : t("create"))}
                         </Button>
                     </DialogFooter>
                 </form>

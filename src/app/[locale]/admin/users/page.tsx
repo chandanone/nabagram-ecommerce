@@ -5,6 +5,7 @@ import { Users, Mail, Shield, MoreVertical, UserPlus, Search } from "lucide-reac
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useTranslations, useLocale } from "next-intl";
 
 const users = [
     { id: "1", name: "Priya Sharma", email: "priya@example.com", role: "USER", joined: "Jan 12, 2024" },
@@ -14,10 +15,11 @@ const users = [
     { id: "5", name: "Suresh Kumar", email: "suresh@example.com", role: "USER", joined: "Jan 20, 2024" },
 ];
 
-import { useTranslations } from "next-intl";
-
 export default function UsersPage() {
     const t = useTranslations("AdminUsers");
+    const tCommon = useTranslations("Common");
+    const locale = useLocale();
+
     return (
         <div className="space-y-8">
             <motion.div
@@ -81,11 +83,15 @@ export default function UsersPage() {
                                                     : "bg-green-100 text-green-700"
                                                 }`}>
                                                 <Shield className="h-3 w-3" />
-                                                {user.role}
+                                                {tCommon(`roles.${user.role}`)}
                                             </span>
                                         </td>
                                         <td className="py-4 text-sm text-[var(--muted)]">
-                                            {user.joined}
+                                            {new Date(user.joined).toLocaleDateString(locale === 'bn' ? 'bn-BD' : 'en-IN', {
+                                                day: 'numeric',
+                                                month: 'short',
+                                                year: 'numeric'
+                                            })}
                                         </td>
                                         <td className="py-4 text-right">
                                             <Button variant="ghost" size="icon" className="hover:bg-[var(--cream)]">

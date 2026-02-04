@@ -85,10 +85,8 @@ export function Footer() {
                         <ul className="space-y-4">
                             <li className="flex gap-3 text-sm">
                                 <MapPin className="h-5 w-5 text-[var(--deep-saffron)] flex-shrink-0 mt-0.5" />
-                                <span className="text-white/70">
-                                    Vill. & P.O.: Kanfala,<br />
-                                    Dist.: Murshidabad,<br />
-                                    West Bengal - 742184
+                                <span className="text-white/70 whitespace-pre-line">
+                                    {t("links.address").split(', ').join('\n')}
                                 </span>
                             </li>
                             <li className="flex gap-3 text-sm">

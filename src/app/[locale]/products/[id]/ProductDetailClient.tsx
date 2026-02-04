@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { ArrowLeft, ShoppingCart, Heart, Share2, Minus, Plus, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
@@ -11,12 +10,16 @@ import { formatPrice, getFabricLabel, getCountLabel, getOptimizedImageUrl } from
 import { toast } from "sonner";
 import { SafeProduct } from "@/lib/types";
 import Link from "next/link";
+import { useTranslations, useLocale } from "next-intl";
+import { useRouter } from "@/i18n/routing";
 
 interface ProductDetailClientProps {
     product: SafeProduct;
 }
 
 export default function ProductDetailClient({ product }: ProductDetailClientProps) {
+    const t = useTranslations("ProductDetail");
+    const locale = useLocale();
     const router = useRouter();
     const [quantity, setQuantity] = useState(1);
     const [selectedImage, setSelectedImage] = useState(0);
@@ -32,7 +35,8 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
             fabricType: product.fabricType.toString(),
             fabricCount: product.fabricCount || undefined,
         }, quantity);
-        toast.success(`${product.name} added to cart`);
+
+        toast.success(locale === 'bn' ? `${product.name} ব্যাগে যোগ করা হয়েছে` : `${product.name} added to cart`);
         setIsAdded(true);
         setTimeout(() => setIsAdded(false), 2000);
     };
@@ -47,7 +51,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                     className="mb-8 gap-2"
                 >
                     <ArrowLeft className="h-4 w-4" />
-                    Back
+                    {t("back")}
                 </Button>
 
                 <div className="grid lg:grid-cols-2 gap-12">
@@ -110,7 +114,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                                 </Button>
                                 <Button variant="ghost" size="icon" onClick={() => {
                                     navigator.clipboard.writeText(window.location.href);
-                                    toast.success("Link copied to clipboard!");
+                                    toast.success(t("copyLink"));
                                 }}>
                                     <Share2 className="h-5 w-5" />
                                 </Button>
@@ -118,7 +122,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                         </div>
 
                         <p className="text-4xl font-bold text-[var(--silk-indigo)] mb-6">
-                            {formatPrice(product.price)}
+                            {formatPrice(product.price, locale === 'bn' ? 'bn-IN' : 'en-IN')}
                         </p>
 
                         <p className="text-[var(--muted)] leading-relaxed mb-8">
@@ -131,14 +135,14 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                                 <>
                                     <span className="w-2 h-2 rounded-full bg-green-500" />
                                     <span className="text-green-600 text-sm font-medium">
-                                        In Stock ({product.stock} available)
+                                        {t("inStock", { count: locale === 'bn' ? product.stock.toLocaleString('bn-BD') : product.stock })}
                                     </span>
                                 </>
                             ) : (
                                 <>
                                     <span className="w-2 h-2 rounded-full bg-red-500" />
                                     <span className="text-red-600 text-sm font-medium">
-                                        Out of Stock
+                                        {t("outOfStock")}
                                     </span>
                                 </>
                             )}
@@ -146,7 +150,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
                         {/* Quantity */}
                         <div className="flex items-center gap-4 mb-8">
-                            <span className="font-medium text-[var(--silk-indigo)]">Quantity:</span>
+                            <span className="font-medium text-[var(--silk-indigo)]">{t("quantity")}</span>
                             <div className="flex items-center glass rounded-xl">
                                 <button
                                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -155,7 +159,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                                     <Minus className="h-4 w-4" />
                                 </button>
                                 <span className="px-6 font-medium min-w-[60px] text-center">
-                                    {quantity}
+                                    {locale === 'bn' ? quantity.toLocaleString('bn-BD') : quantity}
                                 </span>
                                 <button
                                     onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
@@ -177,18 +181,18 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                                 {isAdded ? (
                                     <>
                                         <Check className="h-5 w-5" />
-                                        Added to Cart
+                                        {t("added")}
                                     </>
                                 ) : (
                                     <>
                                         <ShoppingCart className="h-5 w-5" />
-                                        Add to Cart
+                                        {t("addToCart")}
                                     </>
                                 )}
                             </Button>
                             <Link href="/checkout" className="flex-1" onClick={handleAddToCart}>
                                 <Button size="xl" variant="secondary" className="w-full rounded-xl">
-                                    Buy Now
+                                    {t("buyNow")}
                                 </Button>
                             </Link>
                         </div>
@@ -196,10 +200,10 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
                         {/* Features */}
                         <div className="mt-12 grid grid-cols-2 gap-6">
                             {[
-                                { label: "Handwoven", value: "100% Artisan Made" },
-                                { label: "Material", value: getFabricLabel(product.fabricType) },
-                                { label: "Origin", value: "Murshidabad, WB" },
-                                { label: "KVIC Certified", value: "Government Approved" },
+                                { label: t("features.handwoven"), value: t("features.handwovenVal") },
+                                { label: t("features.material"), value: getFabricLabel(product.fabricType) },
+                                { label: t("features.origin"), value: t("features.originVal") },
+                                { label: t("features.kvic"), value: t("features.kvicVal") },
                             ].map((feature) => (
                                 <div key={feature.label} className="glass rounded-xl p-4">
                                     <p className="text-sm text-[var(--muted)]">{feature.label}</p>
