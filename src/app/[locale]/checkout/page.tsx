@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { ArrowLeft, CreditCard, Truck, Shield, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +11,8 @@ import { useCart } from "@/lib/cart";
 import { formatPrice, getFabricLabel } from "@/lib/utils";
 import { createOrder, verifyPayment } from "@/actions/orders";
 import { toast } from "sonner";
+import { useTranslations, useLocale } from "next-intl";
+import { useRouter } from "@/i18n/routing";
 
 interface RazorpayResponse {
     razorpay_payment_id: string;
@@ -51,10 +52,17 @@ declare global {
 }
 
 export default function CheckoutPage() {
+    const t = useTranslations("Checkout");
+    const locale = useLocale();
     const router = useRouter();
-    const { items, getTotalPrice, clearCart } = useCart();
+    const { items, clearCart } = useCart();
     const [isLoading, setIsLoading] = useState(false);
     const [orderSuccess, setOrderSuccess] = useState(false);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
 
     const [formData, setFormData] = useState({
         name: "",
@@ -71,7 +79,7 @@ export default function CheckoutPage() {
     };
 
     const subtotal = useMemo(() => {
-        return items.reduce((acc, item) => acc + item.price * item.quantity, 0);
+        return items.reduce((acc: number, item: any) => acc + item.price * item.quantity, 0);
     }, [items]);
     const tax = subtotal * 0.05;
     const total = subtotal + tax;
@@ -80,8 +88,7 @@ export default function CheckoutPage() {
         try {
             setIsLoading(true);
 
-            // 1. Create order in DB and get Razorpay Order ID
-            const orderItems = items.map(item => ({
+            const orderItems = items.map((item: any) => ({
                 productId: item.productId,
                 quantity: item.quantity
             }));
@@ -92,13 +99,12 @@ export default function CheckoutPage() {
             });
 
             if (!result.success || !result.data) {
-                toast.error(result.error || "Failed to initiate checkout");
+                toast.error(result.error || t("failedInitiate"));
                 return;
             }
 
             const { orderId, razorpayOrderId, amount, currency } = result.data;
 
-            // 2. Open Razorpay checkout
             const options: RazorpayOptions = {
                 key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "rzp_test_demo",
                 amount: amount as number,
@@ -110,7 +116,6 @@ export default function CheckoutPage() {
                 handler: async function (response: RazorpayResponse) {
                     try {
                         setIsLoading(true);
-                        // 3. Verify payment on server
                         const verifyResult = await verifyPayment(orderId, {
                             razorpay_order_id: response.razorpay_order_id,
                             razorpay_payment_id: response.razorpay_payment_id,
@@ -122,7 +127,6 @@ export default function CheckoutPage() {
                             return;
                         }
 
-                        // 4. Cleanup and redirect
                         clearCart();
                         toast.success("Payment successful!");
                         router.push(`/account/orders/${orderId}`);
@@ -159,7 +163,7 @@ export default function CheckoutPage() {
 
             const isLoaded = await loadRazorpay();
             if (!isLoaded) {
-                toast.error("Failed to load Razorpay. Please check your connection.");
+                toast.error(t("failedRazorpay"));
                 return;
             }
 
@@ -167,13 +171,15 @@ export default function CheckoutPage() {
             razorpay.open();
         } catch (error: any) {
             console.error("Checkout failed:", error);
-            toast.error(error.message || "Failed to initiate checkout");
+            toast.error(error.message || t("failedInitiate"));
         } finally {
             setIsLoading(false);
         }
     };
 
     const [showMobileSummary, setShowMobileSummary] = useState(false);
+
+    if (!mounted) return null;
 
     if (orderSuccess) {
         return (
@@ -187,13 +193,13 @@ export default function CheckoutPage() {
                         <CheckCircle className="h-10 w-10 text-green-600" />
                     </div>
                     <h1 className="text-2xl md:text-3xl font-bold text-[var(--silk-indigo)] mb-4">
-                        Order Placed Successfully!
+                        {t("orderSuccess")}
                     </h1>
                     <p className="text-[var(--muted)] mb-8">
-                        Thank you for your purchase. We&apos;ve sent a confirmation email with your order details.
+                        {t("orderSuccessDesc")}
                     </p>
                     <Link href="/products" className="block">
-                        <Button size="lg" className="w-full">Continue Shopping</Button>
+                        <Button size="lg" className="w-full">{t("continue")}</Button>
                     </Link>
                 </motion.div>
             </div>
@@ -205,10 +211,10 @@ export default function CheckoutPage() {
             <div className="min-h-screen flex items-center justify-center px-4">
                 <div className="text-center glass p-8 rounded-3xl max-w-xs w-full">
                     <h1 className="text-xl font-bold text-[var(--silk-indigo)] mb-6">
-                        Your Cart is Empty
+                        {t("empty")}
                     </h1>
                     <Link href="/products" className="block">
-                        <Button className="w-full">Browse Products</Button>
+                        <Button className="w-full">{t("browse")}</Button>
                     </Link>
                 </div>
             </div>
@@ -224,8 +230,10 @@ export default function CheckoutPage() {
                         <ArrowLeft className="h-5 w-5" />
                     </Button>
                     <div>
-                        <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)]">Total Amount</p>
-                        <p className="text-lg font-bold text-[var(--silk-indigo)] leading-none">{formatPrice(total)}</p>
+                        <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--muted)]">{t("mobileTotal")}</p>
+                        <p className="text-lg font-bold text-[var(--silk-indigo)] leading-none">
+                            {formatPrice(total, locale === 'bn' ? 'bn-IN' : 'en-IN')}
+                        </p>
                     </div>
                 </div>
                 <Button
@@ -234,7 +242,7 @@ export default function CheckoutPage() {
                     onClick={() => setShowMobileSummary(!showMobileSummary)}
                     className="text-xs font-bold border-[var(--deep-saffron)] text-[var(--deep-saffron)] rounded-full px-4"
                 >
-                    {showMobileSummary ? "Hide details" : "Show details"}
+                    {showMobileSummary ? t("hideDetails") : t("showDetails")}
                 </Button>
             </div>
 
@@ -246,7 +254,7 @@ export default function CheckoutPage() {
                     className="hidden lg:flex mb-8 gap-2 hover:bg-white/50 rounded-full"
                 >
                     <ArrowLeft className="h-4 w-4" />
-                    Back to shopping
+                    {t("back")}
                 </Button>
 
                 <div className="flex flex-col lg:flex-row gap-8">
@@ -257,7 +265,7 @@ export default function CheckoutPage() {
                             animate={{ opacity: 1, y: 0 }}
                             className="hidden lg:block text-4xl font-bold text-[var(--silk-indigo)] mb-8"
                         >
-                            Checkout
+                            {t("title")}
                         </motion.h1>
 
                         {/* Shipping Form */}
@@ -273,34 +281,34 @@ export default function CheckoutPage() {
                                     <div className="w-10 h-10 rounded-xl bg-[var(--deep-saffron)]/10 flex items-center justify-center">
                                         <Truck className="h-5 w-5 text-[var(--deep-saffron)]" />
                                     </div>
-                                    Shipping Information
+                                    {t("shippingInfo")}
                                 </h2>
 
                                 <div className="grid gap-6">
                                     <div className="grid md:grid-cols-2 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-xs font-bold uppercase tracking-wider text-[var(--muted)] ml-1">
-                                                Full Name
+                                                {t("fullName")}
                                             </label>
                                             <Input
                                                 name="name"
                                                 value={formData.name}
                                                 onChange={handleInputChange}
-                                                placeholder="Enter full name"
+                                                placeholder={t("fullNamePlaceholder")}
                                                 className="h-12 bg-white/50 border-[var(--warm-gray)]/30 rounded-xl focus:ring-[var(--deep-saffron)]"
                                                 required
                                             />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-xs font-bold uppercase tracking-wider text-[var(--muted)] ml-1">
-                                                Email Address
+                                                {t("email")}
                                             </label>
                                             <Input
                                                 name="email"
                                                 type="email"
                                                 value={formData.email}
                                                 onChange={handleInputChange}
-                                                placeholder="your@email.com"
+                                                placeholder={t("emailPlaceholder")}
                                                 className="h-12 bg-white/50 border-[var(--warm-gray)]/30 rounded-xl focus:ring-[var(--deep-saffron)]"
                                                 required
                                             />
@@ -309,13 +317,13 @@ export default function CheckoutPage() {
 
                                     <div className="space-y-2">
                                         <label className="text-xs font-bold uppercase tracking-wider text-[var(--muted)] ml-1">
-                                            Phone Number
+                                            {t("phone")}
                                         </label>
                                         <Input
                                             name="phone"
                                             value={formData.phone}
                                             onChange={handleInputChange}
-                                            placeholder="+91 98765 43210"
+                                            placeholder={t("phonePlaceholder")}
                                             className="h-12 bg-white/50 border-[var(--warm-gray)]/30 rounded-xl focus:ring-[var(--deep-saffron)]"
                                             required
                                         />
@@ -323,13 +331,13 @@ export default function CheckoutPage() {
 
                                     <div className="space-y-2">
                                         <label className="text-xs font-bold uppercase tracking-wider text-[var(--muted)] ml-1">
-                                            Delivery Address
+                                            {t("address")}
                                         </label>
                                         <Input
                                             name="address"
                                             value={formData.address}
                                             onChange={handleInputChange}
-                                            placeholder="House no., Street, Area"
+                                            placeholder={t("addressPlaceholder")}
                                             className="h-12 bg-white/50 border-[var(--warm-gray)]/30 rounded-xl focus:ring-[var(--deep-saffron)]"
                                             required
                                         />
@@ -338,39 +346,39 @@ export default function CheckoutPage() {
                                     <div className="grid md:grid-cols-3 gap-6">
                                         <div className="space-y-2">
                                             <label className="text-xs font-bold uppercase tracking-wider text-[var(--muted)] ml-1">
-                                                City
+                                                {t("city")}
                                             </label>
                                             <Input
                                                 name="city"
                                                 value={formData.city}
                                                 onChange={handleInputChange}
-                                                placeholder="City"
+                                                placeholder={t("cityPlaceholder")}
                                                 className="h-12 bg-white/50 border-[var(--warm-gray)]/30 rounded-xl focus:ring-[var(--deep-saffron)]"
                                                 required
                                             />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-xs font-bold uppercase tracking-wider text-[var(--muted)] ml-1">
-                                                State
+                                                {t("state")}
                                             </label>
                                             <Input
                                                 name="state"
                                                 value={formData.state}
                                                 onChange={handleInputChange}
-                                                placeholder="State"
+                                                placeholder={t("statePlaceholder")}
                                                 className="h-12 bg-white/50 border-[var(--warm-gray)]/30 rounded-xl focus:ring-[var(--deep-saffron)]"
                                                 required
                                             />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="text-xs font-bold uppercase tracking-wider text-[var(--muted)] ml-1">
-                                                Pincode
+                                                {t("pincode")}
                                             </label>
                                             <Input
                                                 name="pincode"
                                                 value={formData.pincode}
                                                 onChange={handleInputChange}
-                                                placeholder="000000"
+                                                placeholder={t("pincodePlaceholder")}
                                                 className="h-12 bg-white/50 border-[var(--warm-gray)]/30 rounded-xl focus:ring-[var(--deep-saffron)]"
                                                 required
                                             />
@@ -380,12 +388,12 @@ export default function CheckoutPage() {
                             </div>
                         </motion.div>
 
-                        {/* Trust Badges - Hidden on mobile if redundant */}
+                        {/* Trust Badges */}
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
                             {[
-                                { icon: Shield, label: "Secure Payment", desc: "256-bit encryption" },
-                                { icon: Truck, label: "Fast Shipping", desc: "Murshidabad to you" },
-                                { icon: CreditCard, label: "Easy Returns", desc: "7-day policy" },
+                                { icon: Shield, label: t("securePayment"), desc: t("securePaymentDesc") },
+                                { icon: Truck, label: t("fastShipping"), desc: t("fastShippingDesc") },
+                                { icon: CreditCard, label: t("easyReturns"), desc: t("easyReturnsDesc") },
                             ].map(({ icon: Icon, label, desc }) => (
                                 <div
                                     key={label}
@@ -412,12 +420,12 @@ export default function CheckoutPage() {
                         >
                             <div className="glass rounded-3xl p-6 md:p-8 relative overflow-hidden shadow-xl shadow-[var(--silk-indigo)]/5">
                                 <h2 className="text-xl font-bold text-[var(--silk-indigo)] mb-6">
-                                    Order Summary
+                                    {t("orderSummary")}
                                 </h2>
 
                                 {/* Items Container */}
                                 <div className="space-y-5 mb-8 max-h-[40vh] lg:max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                                    {items.map((item) => (
+                                    {items.map((item: any) => (
                                         <div key={item.productId} className="flex gap-4 group">
                                             <div className="relative w-20 h-24 rounded-2xl overflow-hidden shrink-0 shadow-md">
                                                 <Image
@@ -437,9 +445,9 @@ export default function CheckoutPage() {
                                                     </h3>
                                                 </div>
                                                 <div className="flex justify-between items-end mt-2">
-                                                    <p className="text-xs text-[var(--muted)] font-medium">Qty: {item.quantity}</p>
+                                                    <p className="text-xs text-[var(--muted)] font-medium">{t("qty")}: {item.quantity}</p>
                                                     <p className="font-bold text-[var(--silk-indigo)]">
-                                                        {formatPrice(item.price * item.quantity)}
+                                                        {formatPrice(item.price * item.quantity, locale === 'bn' ? 'bn-IN' : 'en-IN')}
                                                     </p>
                                                 </div>
                                             </div>
@@ -450,20 +458,26 @@ export default function CheckoutPage() {
                                 {/* Totals Section */}
                                 <div className="space-y-3.5 border-t border-[var(--warm-gray)]/10 pt-6 mb-8">
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-[var(--muted)] font-medium">Subtotal</span>
-                                        <span className="font-bold text-[var(--silk-indigo)]">{formatPrice(subtotal)}</span>
+                                        <span className="text-[var(--muted)] font-medium">{t("subtotal")}</span>
+                                        <span className="font-bold text-[var(--silk-indigo)]">
+                                            {formatPrice(subtotal, locale === 'bn' ? 'bn-IN' : 'en-IN')}
+                                        </span>
                                     </div>
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-[var(--muted)] font-medium">Shipping Fee</span>
-                                        <span className="text-green-600 font-bold uppercase text-[10px] tracking-widest pt-1">Free</span>
+                                        <span className="text-[var(--muted)] font-medium">{t("shippingFee")}</span>
+                                        <span className="text-green-600 font-bold uppercase text-[10px] tracking-widest pt-1">{t("free")}</span>
                                     </div>
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-[var(--muted)] font-medium">GST (5%)</span>
-                                        <span className="font-bold text-[var(--silk-indigo)]">{formatPrice(tax)}</span>
+                                        <span className="text-[var(--muted)] font-medium">{t("gst")}</span>
+                                        <span className="font-bold text-[var(--silk-indigo)]">
+                                            {formatPrice(tax, locale === 'bn' ? 'bn-IN' : 'en-IN')}
+                                        </span>
                                     </div>
                                     <div className="flex justify-between text-xl font-bold text-[var(--silk-indigo)] pt-5 border-t border-[var(--warm-gray)]/10">
-                                        <span>Total</span>
-                                        <span className="text-[var(--deep-saffron)]">{formatPrice(total)}</span>
+                                        <span>{t("total")}</span>
+                                        <span className="text-[var(--deep-saffron)]">
+                                            {formatPrice(total, locale === 'bn' ? 'bn-IN' : 'en-IN')}
+                                        </span>
                                     </div>
                                 </div>
 
@@ -475,12 +489,12 @@ export default function CheckoutPage() {
                                     {isLoading ? (
                                         <span className="flex items-center gap-3">
                                             <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                            Authorizing...
+                                            {t("authorizing")}
                                         </span>
                                     ) : (
                                         <span className="flex items-center gap-2">
                                             <CreditCard className="h-5 w-5 group-hover:rotate-12 transition-transform" />
-                                            Proceed to Pay
+                                            {t("proceedToPay")}
                                         </span>
                                     )}
                                 </Button>
@@ -488,7 +502,7 @@ export default function CheckoutPage() {
                                 <div className="flex items-center justify-center gap-2 mt-4">
                                     <Shield className="h-3 w-3 text-green-600" />
                                     <p className="text-[10px] text-center text-[var(--muted)] font-medium italic">
-                                        Your payment is secured by Razorpay
+                                        {t("secureBy")}
                                     </p>
                                 </div>
                             </div>

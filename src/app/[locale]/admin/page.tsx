@@ -14,41 +14,46 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/routing";
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
+import { formatPrice, toBengaliDigits } from "@/lib/utils";
 
 export default function AdminDashboard() {
     const t = useTranslations("AdminDashboard");
+    const tCommon = useTranslations("Common");
+    const locale = useLocale();
+
+    const priceLocale = locale === 'bn' ? 'bn-IN' : 'en-IN';
 
     // Stats data moved inside component to use translations
     const stats = [
         {
             title: t("stats.revenue"),
-            value: "₹2,45,000",
-            change: "+12%",
+            value: formatPrice(245000, priceLocale),
+            change: locale === 'bn' ? "+১২%" : "+12%",
             trending: "up",
             icon: IndianRupee,
             color: "bg-green-500"
         },
         {
             title: t("stats.orders"),
-            value: "48",
-            change: "+8%",
+            value: locale === 'bn' ? toBengaliDigits(48) : "48",
+            change: locale === 'bn' ? "+৮%" : "+8%",
             trending: "up",
             icon: ShoppingCart,
             color: "bg-blue-500"
         },
         {
             title: t("stats.products"),
-            value: "24",
-            change: "+2",
+            value: locale === 'bn' ? toBengaliDigits(24) : "24",
+            change: locale === 'bn' ? "+২" : "+2",
             trending: "up",
             icon: Package,
             color: "bg-purple-500"
         },
         {
             title: t("stats.customers"),
-            value: "156",
-            change: "+23%",
+            value: locale === 'bn' ? toBengaliDigits(156) : "156",
+            change: locale === 'bn' ? "+২৩%" : "+23%",
             trending: "up",
             icon: Users,
             color: "bg-orange-500"
@@ -56,10 +61,10 @@ export default function AdminDashboard() {
     ];
 
     const recentOrders = [
-        { id: "ORD001", customer: "Priya Sharma", product: "Royal Muslin 100s", amount: 12500, status: "Paid" },
-        { id: "ORD002", customer: "Rahul Verma", product: "Silk Saree - Paisley", amount: 18500, status: "Processing" },
-        { id: "ORD003", customer: "Anita Das", product: "Heritage Muslin 80s", amount: 9500, status: "Shipped" },
-        { id: "ORD004", customer: "Suresh Kumar", product: "Artisan Silk Than", amount: 22000, status: "Delivered" },
+        { id: "ORD001", customer: "Priya Sharma", product: "Royal Muslin 100s", amount: 12500, status: "PAID" },
+        { id: "ORD002", customer: "Rahul Verma", product: "Silk Saree - Paisley", amount: 18500, status: "PROCESSING" },
+        { id: "ORD003", customer: "Anita Das", product: "Heritage Muslin 80s", amount: 9500, status: "SHIPPED" },
+        { id: "ORD004", customer: "Suresh Kumar", product: "Artisan Silk Than", amount: 22000, status: "DELIVERED" },
     ];
 
     const lowStockProducts = [
@@ -152,14 +157,14 @@ export default function AdminDashboard() {
                                                 <td className="py-3 text-sm font-medium text-[var(--silk-indigo)]">{order.id}</td>
                                                 <td className="py-3 text-sm text-[var(--muted)]">{order.customer}</td>
                                                 <td className="py-3 text-sm text-[var(--muted)]">{order.product}</td>
-                                                <td className="py-3 text-sm text-right font-medium">₹{order.amount.toLocaleString()}</td>
+                                                <td className="py-3 text-sm text-right font-medium">{formatPrice(order.amount, priceLocale)}</td>
                                                 <td className="py-3 text-right">
-                                                    <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${order.status === "Paid" ? "bg-yellow-100 text-yellow-700" :
-                                                        order.status === "Processing" ? "bg-blue-100 text-blue-700" :
-                                                            order.status === "Shipped" ? "bg-purple-100 text-purple-700" :
+                                                    <span className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${order.status === "PAID" ? "bg-yellow-100 text-yellow-700" :
+                                                        order.status === "PROCESSING" ? "bg-blue-100 text-blue-700" :
+                                                            order.status === "SHIPPED" ? "bg-purple-100 text-purple-700" :
                                                                 "bg-green-100 text-green-700"
                                                         }`}>
-                                                        {order.status}
+                                                        {tCommon(`status.${order.status}`)}
                                                     </span>
                                                 </td>
                                             </tr>
@@ -193,7 +198,7 @@ export default function AdminDashboard() {
                                                 {product.name}
                                             </p>
                                             <p className="text-xs text-[var(--muted)]">
-                                                {t("lowStock.leftInStock", { count: product.stock })}
+                                                {t("lowStock.leftInStock", { count: locale === 'bn' ? toBengaliDigits(product.stock) : product.stock })}
                                             </p>
                                         </div>
                                         <Button variant="outline" size="sm">

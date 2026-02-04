@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { Mail, Lock, User, Eye, EyeOff, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 interface LoginModalProps {
     open: boolean;
@@ -24,6 +25,7 @@ interface LoginModalProps {
 }
 
 export function LoginModal({ open, onOpenChange }: LoginModalProps) {
+    const t = useTranslations("Auth");
     const [isLogin, setIsLogin] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -46,9 +48,9 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                 });
 
                 if (result?.error) {
-                    toast.error("Invalid email or password");
+                    toast.error(t("invalidAuth"));
                 } else {
-                    toast.success("Welcome back!");
+                    toast.success(t("welcome"));
                     onOpenChange(false);
                     const role = await getUserRole(email);
                     if (role === "ADMIN" || role === "SALESPERSON") {
@@ -62,7 +64,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                 if (result?.error) {
                     toast.error(result.error);
                 } else {
-                    toast.success("Account created successfully!");
+                    toast.success(t("registerSuccess"));
                     const loginResult = await signIn("credentials", {
                         email,
                         password,
@@ -73,7 +75,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                 }
             }
         } catch (error) {
-            toast.error("An unexpected error occurred");
+            toast.error(t("unexpectedError"));
         } finally {
             setIsLoading(false);
         }
@@ -87,12 +89,12 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                         N
                     </div>
                     <DialogTitle className="text-2xl font-bold text-[var(--charcoal)]">
-                        {isLogin ? "Welcome Back" : "Create Account"}
+                        {isLogin ? t("welcomeBack") : t("createAccount")}
                     </DialogTitle>
                     <DialogDescription className="text-sm">
                         {isLogin
-                            ? "Sign in to access your account and exclusive collections"
-                            : "Join us and discover the heritage of Murshidabad"}
+                            ? t("loginDesc")
+                            : t("registerDesc")}
                     </DialogDescription>
                 </DialogHeader>
 
@@ -121,7 +123,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                                     fill="#EA4335"
                                 />
                             </svg>
-                            Google
+                            {t("google")}
                         </Button>
 
                         <Button
@@ -134,7 +136,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                                 <circle cx="12" cy="12" r="4" stroke="#C13584" strokeWidth="2" />
                                 <circle cx="18" cy="6" r="1.5" fill="#C13584" />
                             </svg>
-                            Instagram
+                            {t("instagram")}
                         </Button>
                     </div>
 
@@ -143,7 +145,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                             <span className="w-full border-t border-gray-100" />
                         </div>
                         <div className="relative flex justify-center text-[10px] uppercase font-semibold">
-                            <span className="bg-white px-2 text-[var(--muted)]">Or with email</span>
+                            <span className="bg-white px-2 text-[var(--muted)]">{t("orEmail")}</span>
                         </div>
                     </div>
 
@@ -156,13 +158,13 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                                     exit={{ opacity: 0, height: 0 }}
                                     className="space-y-1.5"
                                 >
-                                    <Label htmlFor="modal-name">Full Name</Label>
+                                    <Label htmlFor="modal-name">{t("fullName")}</Label>
                                     <div className="relative">
                                         <User className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--muted)]" />
                                         <Input
                                             id="modal-name"
                                             name="name"
-                                            placeholder="John Doe"
+                                            placeholder={t("fullNamePlaceholder")}
                                             required={!isLogin}
                                             className="pl-9 h-10 text-sm focus-visible:ring-[var(--deep-saffron)]"
                                         />
@@ -171,14 +173,14 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                             )}
                         </AnimatePresence>
                         <div className="space-y-1.5">
-                            <Label htmlFor="modal-email">Email</Label>
+                            <Label htmlFor="modal-email">{t("email")}</Label>
                             <div className="relative">
                                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--muted)]" />
                                 <Input
                                     id="modal-email"
                                     name="email"
                                     type="email"
-                                    placeholder="m@example.com"
+                                    placeholder={t("emailPlaceholder")}
                                     required
                                     className="pl-9 h-10 text-sm focus-visible:ring-[var(--deep-saffron)]"
                                 />
@@ -186,7 +188,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                         </div>
                         <div className="space-y-1.5">
                             <div className="flex items-center justify-between">
-                                <Label htmlFor="modal-password">Password</Label>
+                                <Label htmlFor="modal-password">{t("password")}</Label>
                             </div>
                             <div className="relative">
                                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--muted)]" />
@@ -214,7 +216,7 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                             {isLoading ? (
                                 <Loader2 className="h-4 w-4 animate-spin" />
                             ) : (
-                                isLogin ? "Sign In" : "Create Account"
+                                isLogin ? t("signIn") : t("signUp")
                             )}
                         </Button>
                     </form>
@@ -225,18 +227,18 @@ export function LoginModal({ open, onOpenChange }: LoginModalProps) {
                         onClick={() => setIsLogin(!isLogin)}
                         className="text-xs text-[var(--deep-saffron)] font-semibold hover:underline"
                     >
-                        {isLogin ? "Don't have an account? Sign up" : "Already have an account? Log in"}
+                        {isLogin ? t("noAccount") : t("haveAccount")}
                     </button>
                 </div>
 
                 <p className="text-center text-[10px] text-[var(--muted)] pt-2 border-t border-gray-50">
-                    By continuing, you agree to our{" "}
+                    {t("termsAgreement")}{" "}
                     <a href="/terms" className="text-[var(--deep-saffron)] hover:underline">
-                        Terms
+                        {t("terms")}
                     </a>{" "}
-                    and{" "}
+                    {t("and")}{" "}
                     <a href="/privacy" className="text-[var(--deep-saffron)] hover:underline">
-                        Privacy
+                        {t("privacy")}
                     </a>
                 </p>
             </DialogContent>

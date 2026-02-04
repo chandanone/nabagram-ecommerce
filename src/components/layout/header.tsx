@@ -9,11 +9,12 @@ import { useSession } from "next-auth/react";
 import { LoginModal } from "@/components/auth/login-modal";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { useCart } from "@/lib/cart";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { LanguageSwitcher } from "./language-switcher";
 
 export function Header() {
     const t = useTranslations("Header");
+    const locale = useLocale();
     const [isOpen, setIsOpen] = React.useState(false);
     const [isScrolled, setIsScrolled] = React.useState(false);
     const [showLogin, setShowLogin] = React.useState(false);
@@ -101,7 +102,7 @@ export function Header() {
                                     <span className="sr-only">{t("cart")}</span>
                                     {mounted && count > 0 && (
                                         <span className="absolute -top-1 -right-1 w-5 h-5 bg-[var(--deep-saffron)] text-white text-xs rounded-full flex items-center justify-center">
-                                            {count}
+                                            {locale === 'bn' ? count.toLocaleString('bn-BD') : count}
                                         </span>
                                     )}
                                 </Button>

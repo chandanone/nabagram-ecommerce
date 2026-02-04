@@ -25,11 +25,12 @@ const demoOrders = [
     { id: "ORD006", customer: "Amit Singh", email: "amit@email.com", items: 1, total: 35000, status: "CANCELLED", date: "2024-01-23" },
 ];
 
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 
 export default function AdminOrdersPage() {
     const t = useTranslations("AdminOrders");
     const tCommon = useTranslations("Common");
+    const locale = useLocale();
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState("");
 
@@ -79,7 +80,9 @@ export default function AdminOrdersPage() {
                 ].map((stat) => (
                     <Card key={stat.label} className="glass">
                         <CardContent className="p-4 text-center">
-                            <p className="text-2xl font-bold text-[var(--silk-indigo)]">{stat.value}</p>
+                            <p className="text-2xl font-bold text-[var(--silk-indigo)]">
+                                {locale === 'bn' ? stat.value.toLocaleString('bn-BD') : stat.value}
+                            </p>
                             <p className="text-sm text-[var(--muted)]">{stat.label}</p>
                         </CardContent>
                     </Card>
@@ -144,8 +147,8 @@ export default function AdminOrdersPage() {
                                                     <p className="text-xs text-[var(--muted)]">{order.email}</p>
                                                 </div>
                                             </td>
-                                            <td className="p-4 text-center">{order.items}</td>
-                                            <td className="p-4 text-right font-medium">{formatPrice(order.total)}</td>
+                                            <td className="p-4 text-center">{locale === 'bn' ? order.items.toLocaleString('bn-BD') : order.items}</td>
+                                            <td className="p-4 text-right font-medium">{formatPrice(order.total, locale === 'bn' ? 'bn-IN' : 'en-IN')}</td>
                                             <td className="p-4 text-center">
                                                 <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${statusObj.color}`}>
                                                     <statusObj.icon className="h-3 w-3" />

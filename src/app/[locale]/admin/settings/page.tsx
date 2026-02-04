@@ -85,7 +85,7 @@ export default function SettingsPage() {
                                 <div className="space-y-0.5">
                                     <Label className="text-base">{t("upload.optimize")}</Label>
                                     <p className="text-sm text-[var(--muted)]">
-                                        {t("upload.optimizeDesc", { threshold: settings.threshold })}
+                                        {t("upload.optimizeDesc", { threshold: locale === 'bn' ? toBengaliDigits(settings.threshold) : settings.threshold })}
                                     </p>
                                 </div>
                                 <div className="flex items-center h-6">

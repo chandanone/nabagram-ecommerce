@@ -7,9 +7,12 @@ import Link from "next/link";
 import { Trash2, Minus, Plus, ShoppingBag, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
+import { useTranslations, useLocale } from "next-intl";
 import { formatPrice, getFabricLabel } from "@/lib/utils";
 
 export default function CartPage() {
+    const t = useTranslations("Cart");
+    const locale = useLocale();
     const [mounted, setMounted] = useState(false);
     const { items, removeItem, updateQuantity } = useCart();
 
@@ -18,7 +21,7 @@ export default function CartPage() {
     }, []);
 
     const subtotal = useMemo(() => {
-        return items.reduce((total, item) => total + item.price * item.quantity, 0);
+        return items.reduce((total: number, item: any) => total + item.price * item.quantity, 0);
     }, [items]);
 
     const tax = subtotal * 0.05;
@@ -38,15 +41,14 @@ export default function CartPage() {
                 >
                     <ShoppingBag className="h-24 w-24 mx-auto text-[var(--warm-gray)] mb-6" />
                     <h1 className="text-2xl font-bold text-[var(--silk-indigo)] mb-4">
-                        Your Cart is Empty
+                        {t("empty")}
                     </h1>
                     <p className="text-[var(--muted)] mb-8 max-w-md">
-                        Looks like you haven&apos;t added anything to your cart yet.
-                        Explore our collections and find something you love.
+                        {t("emptyDesc")}
                     </p>
                     <Link href="/products">
                         <Button size="lg" className="gap-2">
-                            Explore Collections
+                            {t("explore")}
                             <ArrowRight className="h-4 w-4" />
                         </Button>
                     </Link>
@@ -63,13 +65,13 @@ export default function CartPage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="text-3xl md:text-4xl font-bold text-[var(--silk-indigo)] mb-8"
                 >
-                    Shopping Cart
+                    {t("title")}
                 </motion.h1>
 
                 <div className="grid lg:grid-cols-3 gap-8">
                     {/* Cart Items */}
                     <div className="lg:col-span-2 space-y-4">
-                        {items.map((item, index) => (
+                        {items.map((item: any, index: number) => (
                             <motion.div
                                 key={item.productId}
                                 initial={{ opacity: 0, y: 20 }}
@@ -121,7 +123,7 @@ export default function CartPage() {
                                             </button>
                                         </div>
                                         <p className="font-bold text-[var(--silk-indigo)]">
-                                            {formatPrice(item.price * item.quantity)}
+                                            {formatPrice(item.price * item.quantity, locale === 'bn' ? 'bn-IN' : 'en-IN')}
                                         </p>
                                     </div>
                                 </div>
@@ -137,40 +139,40 @@ export default function CartPage() {
                             className="glass rounded-2xl p-6 sticky top-28"
                         >
                             <h2 className="text-xl font-bold text-[var(--silk-indigo)] mb-6">
-                                Order Summary
+                                {t("orderSummary")}
                             </h2>
 
                             <div className="space-y-4 mb-6">
                                 <div className="flex justify-between text-[var(--muted)]">
-                                    <span>Subtotal</span>
-                                    <span>{formatPrice(subtotal)}</span>
+                                    <span>{t("subtotal")}</span>
+                                    <span>{formatPrice(subtotal, locale === 'bn' ? 'bn-IN' : 'en-IN')}</span>
                                 </div>
                                 <div className="flex justify-between text-[var(--muted)]">
-                                    <span>Shipping</span>
-                                    <span className="text-green-600">Free</span>
+                                    <span>{t("shipping")}</span>
+                                    <span className="text-green-600 font-medium">{t("free")}</span>
                                 </div>
                                 <div className="flex justify-between text-[var(--muted)]">
-                                    <span>Tax (GST 5%)</span>
-                                    <span>{formatPrice(tax)}</span>
+                                    <span>{t("tax")}</span>
+                                    <span>{formatPrice(tax, locale === 'bn' ? 'bn-IN' : 'en-IN')}</span>
                                 </div>
                             </div>
 
                             <div className="border-t border-[var(--warm-gray)]/20 pt-4 mb-6">
                                 <div className="flex justify-between text-lg font-bold text-[var(--silk-indigo)]">
-                                    <span>Total</span>
-                                    <span>{formatPrice(total)}</span>
+                                    <span>{t("total")}</span>
+                                    <span>{formatPrice(total, locale === 'bn' ? 'bn-IN' : 'en-IN')}</span>
                                 </div>
                             </div>
 
                             <Link href="/checkout">
                                 <Button className="w-full" size="lg">
-                                    Proceed to Checkout
+                                    {t("checkout")}
                                 </Button>
                             </Link>
 
                             <Link href="/products">
                                 <Button variant="ghost" className="w-full mt-2">
-                                    Continue Shopping
+                                    {t("continue")}
                                 </Button>
                             </Link>
                         </motion.div>
