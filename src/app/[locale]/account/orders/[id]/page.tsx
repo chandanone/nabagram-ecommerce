@@ -21,21 +21,24 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { formatPrice, getFabricLabel } from "@/lib/utils";
 import { OrderStatus } from "@prisma/client";
+import { getTranslations } from "next-intl/server";
 
 interface OrderPageProps {
     params: Promise<{
         id: string;
+        locale: string;
     }>;
 }
 
 export default async function OrderDetailPage({ params }: OrderPageProps) {
+    const { id, locale } = await params;
+    const t = await getTranslations("OrderDetail");
+    const tStatus = await getTranslations("Common.status");
+
     const session = await auth();
     if (!session?.user) {
         redirect("/");
     }
-
-    // 3. Await the params to get the actual ID
-    const { id } = await params;
 
     const order = await getOrderById(id);
 
@@ -44,14 +47,16 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
     }
 
     const steps = [
-        { status: "PENDING", label: "Order Placed", icon: Clock },
-        { status: "PAID", label: "Payment Confirmed", icon: CreditCard },
-        { status: "PROCESSING", label: "Processing", icon: Package },
-        { status: "SHIPPED", label: "Shipped", icon: Truck },
-        { status: "DELIVERED", label: "Delivered", icon: CheckCircle2 },
+        { status: "PENDING", label: t("steps.PENDING"), icon: Clock },
+        { status: "PAID", label: t("steps.PAID"), icon: CreditCard },
+        { status: "PROCESSING", label: t("steps.PROCESSING"), icon: Package },
+        { status: "SHIPPED", label: t("steps.SHIPPED"), icon: Truck },
+        { status: "DELIVERED", label: t("steps.DELIVERED"), icon: CheckCircle2 },
     ];
 
     const currentStepIndex = steps.findIndex(step => step.status === order.status);
+    const priceLocale = locale === 'bn' ? 'bn-IN' : 'en-IN';
+    const dateLocale = locale === 'bn' ? 'bn-BD' : 'en-IN';
 
     // Status color mapping
     const getStatusColor = (status: OrderStatus) => {
@@ -72,19 +77,19 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
                     <div>
                         <Link href="/account" className="inline-flex items-center gap-2 text-sm font-medium text-[var(--muted)] hover:text-[var(--deep-saffron)] transition-colors mb-4 group">
                             <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
-                            Back to Account
+                            {t("back")}
                         </Link>
                         <h1 className="text-3xl font-bold text-[var(--silk-indigo)]">
-                            Order #{order.id.slice(-8).toUpperCase()}
+                            {t("orderId")} #{order.id.slice(-8).toUpperCase()}
                         </h1>
                         <p className="text-[var(--muted)] mt-1">
-                            Placed on {new Date(order.createdAt).toLocaleDateString("en-IN", {
+                            {t("placedOn")} {new Date(order.createdAt).toLocaleDateString(dateLocale, {
                                 day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit"
                             })}
                         </p>
                     </div>
                     <div className={`px-4 py-2 rounded-xl border font-bold text-sm ${getStatusColor(order.status)}`}>
-                        {order.status}
+                        {tStatus(order.status)}
                     </div>
                 </div>
 
@@ -96,7 +101,7 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
                             <CardContent className="p-6 md:p-8">
                                 <h2 className="text-lg font-bold text-[var(--silk-indigo)] mb-8 flex items-center gap-2">
                                     <Truck className="h-5 w-5 text-[var(--deep-saffron)]" />
-                                    Order Tracking
+                                    {t("tracking")}
                                 </h2>
 
                                 <div className="relative">
@@ -124,7 +129,7 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
                                                         </p>
                                                         {isCurrent && (
                                                             <p className="text-[10px] text-[var(--deep-saffron)] font-medium md:mt-1 animate-pulse">
-                                                                Current Status
+                                                                {t("currentStatus")}
                                                             </p>
                                                         )}
                                                     </div>
@@ -137,11 +142,11 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
                                 {order.trackingNumber && (
                                     <div className="mt-12 p-4 bg-[var(--cotton-white)] rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4 border border-[var(--warm-gray)]/10">
                                         <div>
-                                            <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--muted)]">Tracking Details</p>
+                                            <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--muted)]">{t("trackingDetails")}</p>
                                             <p className="text-sm font-bold text-[var(--silk-indigo)] mt-1">{order.carrier} • {order.trackingNumber}</p>
                                         </div>
                                         <Button variant="outline" size="sm" className="rounded-xl border-[var(--deep-saffron)] text-[var(--deep-saffron)] hover:bg-[var(--deep-saffron)] hover:text-white transition-all font-bold">
-                                            Track Order <ExternalLink className="ml-2 h-3.5 w-3.5" />
+                                            {t("trackOrder")} <ExternalLink className="ml-2 h-3.5 w-3.5" />
                                         </Button>
                                     </div>
                                 )}
@@ -151,7 +156,7 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
                         {/* Order Items */}
                         <Card className="glass border-none overflow-hidden rounded-3xl">
                             <CardContent className="p-6 md:p-8">
-                                <h2 className="text-lg font-bold text-[var(--silk-indigo)] mb-6">Order Items</h2>
+                                <h2 className="text-lg font-bold text-[var(--silk-indigo)] mb-6">{t("orderItems")}</h2>
                                 <div className="space-y-6">
                                     {order.items?.map((item) => (
                                         <div key={item.id} className="flex gap-4 md:gap-6 group">
@@ -172,15 +177,15 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
                                                         {item.product.name}
                                                     </h3>
                                                     <p className="text-xs text-[var(--muted)] line-clamp-1 mt-1">
-                                                        Count: {item.product.fabricCount || "N/A"}
+                                                        {t("count")}: {item.product.fabricCount ? (locale === 'bn' ? item.product.fabricCount.toLocaleString('bn-BD') : item.product.fabricCount) : "N/A"}
                                                     </p>
                                                 </div>
                                                 <div className="flex items-end justify-between">
                                                     <p className="text-sm font-medium text-[var(--muted)]">
-                                                        {formatPrice(item.price)} x {item.quantity}
+                                                        {formatPrice(item.price, priceLocale)} x {locale === 'bn' ? item.quantity.toLocaleString('bn-BD') : item.quantity}
                                                     </p>
                                                     <p className="text-lg font-bold text-[var(--silk-indigo)]">
-                                                        {formatPrice(item.price * item.quantity)}
+                                                        {formatPrice(item.price * item.quantity, priceLocale)}
                                                     </p>
                                                 </div>
                                             </div>
@@ -190,16 +195,16 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
 
                                 <div className="mt-8 pt-6 border-t border-[var(--warm-gray)]/10 space-y-3">
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-[var(--muted)] font-medium">Subtotal</span>
-                                        <span className="font-bold text-[var(--silk-indigo)]">{formatPrice(order.total)}</span>
+                                        <span className="text-[var(--muted)] font-medium">{t("subtotal")}</span>
+                                        <span className="font-bold text-[var(--silk-indigo)]">{formatPrice(order.total, priceLocale)}</span>
                                     </div>
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-[var(--muted)] font-medium">Shipping</span>
-                                        <span className="text-green-600 font-bold uppercase text-[10px]">Free</span>
+                                        <span className="text-[var(--muted)] font-medium">{t("shipping")}</span>
+                                        <span className="text-green-600 font-bold uppercase text-[10px]">{t("free")}</span>
                                     </div>
                                     <div className="flex justify-between text-xl font-bold text-[var(--silk-indigo)] pt-3">
-                                        <span>Total Amount</span>
-                                        <span className="text-[var(--deep-saffron)]">{formatPrice(order.total)}</span>
+                                        <span>{t("total")}</span>
+                                        <span className="text-[var(--deep-saffron)]">{formatPrice(order.total, priceLocale)}</span>
                                     </div>
                                 </div>
                             </CardContent>
@@ -213,7 +218,7 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
                             <CardContent className="p-6">
                                 <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--muted)] mb-4 flex items-center gap-2">
                                     <MapPin className="h-4 w-4 text-[var(--deep-saffron)]" />
-                                    Shipping Address
+                                    {t("shippingAddress")}
                                 </h2>
                                 <div className="space-y-3">
                                     <p className="font-bold text-[var(--silk-indigo)]">{order.shippingName}</p>
@@ -241,7 +246,7 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
                             <CardContent className="p-6">
                                 <h2 className="text-sm font-bold uppercase tracking-widest text-[var(--muted)] mb-4 flex items-center gap-2">
                                     <CreditCard className="h-4 w-4 text-[var(--deep-saffron)]" />
-                                    Payment Method
+                                    {t("paymentMethod")}
                                 </h2>
                                 <div className="space-y-3">
                                     <div className="flex items-center gap-3 p-3 bg-white/50 rounded-xl border border-[var(--warm-gray)]/10">
@@ -249,7 +254,7 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
                                             Razorpay
                                         </div>
                                         <div>
-                                            <p className="text-xs font-bold text-[var(--silk-indigo)]">Online Payment</p>
+                                            <p className="text-xs font-bold text-[var(--silk-indigo)]">{t("onlinePayment")}</p>
                                             <p className="text-[10px] text-[var(--muted)]">ID: {order.razorpayPaymentId || "Processing"}</p>
                                         </div>
                                     </div>
@@ -258,16 +263,16 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
                         </Card>
 
                         {/* Support Card */}
-                        <Card className="glass border-none overflow-hidden rounded-3xl bg-gradient-to-br from-[var(--silk-indigo)] to-[var(--indigo-dark)] text-white">
+                        <Card className="border-none overflow-hidden rounded-3xl bg-gradient-to-br from-[var(--silk-indigo)] to-[var(--indigo-dark)] text-white shadow-xl">
                             <CardContent className="p-6">
                                 <AlertCircle className="h-8 w-8 text-[var(--deep-saffron)] mb-4" />
-                                <h3 className="text-lg font-bold mb-2">Need help?</h3>
+                                <h3 className="text-lg font-bold mb-2">{t("help")}</h3>
                                 <p className="text-xs text-white/70 mb-6 leading-relaxed">
-                                    If you have any questions about your order or need assistance, our support team is here for you.
+                                    {t("helpDesc")}
                                 </p>
                                 <Link href="/contact" className="block">
                                     <Button variant="outline" className="w-full border-white/20 text-white hover:bg-white hover:text-[var(--silk-indigo)] rounded-xl font-bold">
-                                        Contact Support
+                                        {t("contactSupport")}
                                     </Button>
                                 </Link>
                             </CardContent>
