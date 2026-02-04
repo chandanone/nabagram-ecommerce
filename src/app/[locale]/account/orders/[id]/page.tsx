@@ -2,7 +2,7 @@ import { auth } from "@/lib/auth";
 import { getOrderById } from "@/actions/orders";
 import { redirect, notFound } from "next/navigation";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import {
     ArrowLeft,
     Package,

@@ -3,8 +3,11 @@
 import { motion } from "framer-motion";
 import { ContactForm } from "@/components/contact/contact-form";
 import { Mail, MapPin, Phone, Clock } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export default function ContactPage() {
+    const t = useTranslations("Contact");
+
     return (
         <div className="-mt-20 pt-32 pb-20 bg-[var(--cream)]/20 min-h-screen">
             <div className="container">
@@ -15,14 +18,13 @@ export default function ContactPage() {
                     className="text-center mb-16"
                 >
                     <p className="text-[var(--deep-saffron)] font-medium tracking-wider uppercase text-sm mb-4">
-                        Get in Touch
+                        {t("hero.badge")}
                     </p>
                     <h1 className="text-4xl md:text-5xl font-bold text-[var(--silk-indigo)] mb-6">
-                        We'd Love to <span className="text-gradient">Hear From You</span>
+                        {t("hero.title")}
                     </h1>
                     <p className="text-[var(--muted)] max-w-2xl mx-auto">
-                        Whether you are looking for a specific weave, want to place a bulk order,
-                        or simply want to visit our weavers in Murshidabad.
+                        {t("hero.description")}
                     </p>
                 </motion.div>
 
@@ -35,18 +37,16 @@ export default function ContactPage() {
                         className="space-y-8"
                     >
                         <div className="bg-white p-8 rounded-2xl shadow-sm border border-[var(--cream)]">
-                            <h3 className="text-2xl font-bold text-[var(--silk-indigo)] mb-6">Contact Information</h3>
+                            <h3 className="text-2xl font-bold text-[var(--silk-indigo)] mb-6">{t("info.title")}</h3>
                             <div className="space-y-6">
                                 <div className="flex items-start gap-4">
                                     <div className="p-3 rounded-full bg-[var(--cream)] text-[var(--deep-saffron)]">
                                         <MapPin className="h-6 w-6" />
                                     </div>
                                     <div>
-                                        <p className="font-semibold text-[var(--silk-indigo)]">Our Location</p>
+                                        <p className="font-semibold text-[var(--silk-indigo)]">{t("info.location")}</p>
                                         <p className="text-[var(--muted)]">
-                                            Nabagram Seva Sangha,<br />
-                                            Vill. & P.O. - Nabagram,<br />
-                                            Dist. - Murshidabad, West Bengal, 742136
+                                            {t("info.address")}
                                         </p>
                                     </div>
                                 </div>
@@ -56,7 +56,7 @@ export default function ContactPage() {
                                         <Phone className="h-6 w-6" />
                                     </div>
                                     <div>
-                                        <p className="font-semibold text-[var(--silk-indigo)]">Phone</p>
+                                        <p className="font-semibold text-[var(--silk-indigo)]">{t("info.phone")}</p>
                                         <p className="text-[var(--muted)]">+91 98765 43210</p>
                                         <p className="text-[var(--muted)]">+91 3482 123456</p>
                                     </div>
@@ -67,7 +67,7 @@ export default function ContactPage() {
                                         <Mail className="h-6 w-6" />
                                     </div>
                                     <div>
-                                        <p className="font-semibold text-[var(--silk-indigo)]">Email</p>
+                                        <p className="font-semibold text-[var(--silk-indigo)]">{t("info.email")}</p>
                                         <p className="text-[var(--muted)]">contact@nabagramsevasangha.org</p>
                                         <p className="text-[var(--muted)]">sales@nabagramsevasangha.org</p>
                                     </div>
@@ -78,9 +78,9 @@ export default function ContactPage() {
                                         <Clock className="h-6 w-6" />
                                     </div>
                                     <div>
-                                        <p className="font-semibold text-[var(--silk-indigo)]">Visiting Hours</p>
-                                        <p className="text-[var(--muted)]">Mon - Sat: 10:00 AM - 6:00 PM</p>
-                                        <p className="text-[var(--muted)]">Sunday: Closed</p>
+                                        <p className="font-semibold text-[var(--silk-indigo)]">{t("info.hours")}</p>
+                                        <p className="text-[var(--muted)]">{t("info.hoursDetail")}</p>
+                                        <p className="text-[var(--muted)]">{t("info.sunday")}</p>
                                     </div>
                                 </div>
                             </div>

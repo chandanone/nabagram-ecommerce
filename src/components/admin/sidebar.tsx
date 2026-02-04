@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link, usePathname } from "@/i18n/routing";
 import {
     LayoutDashboard,
     Package,
@@ -18,23 +17,26 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
+import { useTranslations } from "next-intl";
+
 interface AdminSidebarProps {
     userRole: string;
 }
 
-const menuItems = [
-    { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/admin/products", label: "Products", icon: Package },
-    { href: "/admin/orders", label: "Orders", icon: ShoppingCart },
-    { href: "/admin/users", label: "Users", icon: Users, adminOnly: true },
-    { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
-    { href: "/admin/settings", label: "Settings", icon: Settings },
-];
-
 export function AdminSidebar({ userRole }: AdminSidebarProps) {
+    const t = useTranslations("AdminSidebar");
     const pathname = usePathname();
     const [collapsed, setCollapsed] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
+
+    const menuItems = [
+        { href: "/admin", label: t("dashboard"), icon: LayoutDashboard },
+        { href: "/admin/products", label: t("products"), icon: Package },
+        { href: "/admin/orders", label: t("orders"), icon: ShoppingCart },
+        { href: "/admin/users", label: t("users"), icon: Users, adminOnly: true },
+        { href: "/admin/analytics", label: t("analytics"), icon: BarChart3 },
+        { href: "/admin/settings", label: t("settings"), icon: Settings },
+    ];
 
     const filteredItems = menuItems.filter(
         (item) => !item.adminOnly || userRole === "ADMIN"
@@ -70,7 +72,7 @@ export function AdminSidebar({ userRole }: AdminSidebarProps) {
                     {/* Header */}
                     <div className="flex items-center justify-between mb-8">
                         {!collapsed && (
-                            <h2 className="font-bold text-[var(--silk-indigo)]">Admin Panel</h2>
+                            <h2 className="font-bold text-[var(--silk-indigo)]">{t("panel")}</h2>
                         )}
                         <button
                             onClick={() => setCollapsed(!collapsed)}
@@ -111,7 +113,7 @@ export function AdminSidebar({ userRole }: AdminSidebarProps) {
                                 className={cn("w-full justify-start gap-3", collapsed && "justify-center")}
                             >
                                 <Package className="h-5 w-5" />
-                                {!collapsed && "View Store"}
+                                {!collapsed && t("viewStore")}
                             </Button>
                         </Link>
                         <Button
@@ -120,7 +122,7 @@ export function AdminSidebar({ userRole }: AdminSidebarProps) {
                             className={cn("w-full justify-start gap-3 text-red-500 hover:text-red-600 hover:bg-red-50", collapsed && "justify-center")}
                         >
                             <LogOut className="h-5 w-5" />
-                            {!collapsed && "Sign Out"}
+                            {!collapsed && t("signOut")}
                         </Button>
                     </div>
                 </div>

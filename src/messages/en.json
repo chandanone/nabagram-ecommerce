@@ -1,0 +1,338 @@
+{
+    "Header": {
+        "home": "Home",
+        "collections": "Collections",
+        "ourHeritage": "Our Heritage",
+        "contact": "Contact",
+        "signIn": "Sign In",
+        "myAccount": "My Account",
+        "signOut": "Sign Out",
+        "nabagram": "Nabagram",
+        "sevaSangha": "Seva Sangha",
+        "search": "Search",
+        "cart": "Cart"
+    },
+    "Home": {
+        "hero": {
+            "badge": "Heritage Handwoven Textiles",
+            "title": "Nabagram Seva Sangha",
+            "description": "Discover the timeless elegance of handwoven muslin and silk, crafted by 28 master spinners and 13 skilled weavers from the heart of Murshidabad.",
+            "explore": "Explore Collections",
+            "story": "Our Story"
+        },
+        "artisan": {
+            "badge": "Our Artisan Community",
+            "title": "The Pulse of Tradition",
+            "description": "Behind every thread lies the dedication of our master craftspeople, preserving techniques passed down through generations.",
+            "masterSpinners": "Master Spinners",
+            "skilledWeavers": "Skilled Weavers",
+            "yearsOfHeritage": "Years of Heritage",
+            "handcrafted": "Handcrafted"
+        },
+        "featured": {
+            "badge": "Curated Selection",
+            "title": "Featured Collections",
+            "viewAll": "View All"
+        },
+        "heritageStory": {
+            "badge": "Our Heritage",
+            "title": "Weaving Stories Since Generations",
+            "description1": "Nabagram Seva Sangha stands as a testament to the rich textile heritage of Murshidabad. Under the Khadi and Village Industries Commission (KVIC), we empower local artisans while preserving the ancient art of muslin and silk weaving.",
+            "description2": "From the finest 100-count muslin that once graced royal courts to intricately printed silk sarees, each piece tells a story of patience, skill, and unwavering dedication to quality.",
+            "discoverStory": "Discover Our Story",
+            "kvicCertified": "KVIC Certified",
+            "kvicDesc": "Authentic Khadi products with government certification"
+        },
+        "categories": {
+            "badge": "Shop By Category",
+            "title": "Explore Our Collections"
+        },
+        "newsletter": {
+            "title": "Join the Heritage Circle",
+            "description": "Be the first to know about new collections, artisan stories, and exclusive offers.",
+            "placeholder": "Enter your email",
+            "subscribe": "Subscribe"
+        }
+    },
+    "Common": {
+        "addToCart": "Add to Cart",
+        "successAdded": "{name} added to cart",
+        "view": "View",
+        "fabric": {
+            "MUSLIN": "Cotton Muslin",
+            "SILK_SAREE": "Silk Sarees",
+            "SILK_THAN": "Silk Than"
+        },
+        "status": {
+            "PENDING": "Pending",
+            "PAID": "Paid",
+            "PROCESSING": "Processing",
+            "SHIPPED": "Shipped",
+            "DELIVERED": "Delivered",
+            "CANCELLED": "Cancelled"
+        }
+    },
+    "Products": {
+        "title": "Our Collections",
+        "description": "Explore our curated selection of premium handwoven textiles, crafted by master artisans of Murshidabad.",
+        "filters": "Filters",
+        "count": "{count} products",
+        "fabricType": "Fabric Type",
+        "threadCount": "Thread Count",
+        "clearFilters": "Clear Filters",
+        "noProducts": "No products found",
+        "noProductsDesc": "Try adjusting your filters to find what you're looking for.",
+        "types": {
+            "all": "All Types",
+            "muslin": "Cotton Muslin",
+            "silkSaree": "Silk Sarees",
+            "silkThan": "Silk Than"
+        },
+        "counts": {
+            "all": "All Counts",
+            "60": "60s Count",
+            "80": "80s Count",
+            "100": "100s Count"
+        }
+    },
+    "About": {
+        "hero": {
+            "badge": "Since 1974",
+            "title": "Weaving History",
+            "description": "Nabagram Seva Sangha is more than a cooperative. It is a guardian of Bengal's textile legacy, weaving dreams in silk and muslin."
+        },
+        "origin": {
+            "title": "From the Heart of Murshidabad",
+            "desc1": "In the historic district of Murshidabad, where the Nawabs once patronized the finest arts, Nabagram Seva Sangha was born with a singular mission: to revive the glory of authentic Khadi.",
+            "desc2": "Certified by the Khadi and Village Industries Commission (KVIC), we operate as a direct-benefit community. Every thread bought from us contributes directly to the household of a master weaver or spinner.",
+            "desc3": "Specializing in 100-count Muslin and pure Silk, our fabrics are not manufactured; they are birthed through the rhythm of handlooms that clack from dawn to dusk."
+        },
+        "stats": {
+            "spinners": "Master Spinners",
+            "weavers": "Skilled Weavers",
+            "heritage": "Years Heritage",
+            "fibers": "Natural Fibers"
+        },
+        "values": {
+            "title": "Our Core Values",
+            "subtitle": "Principles that guide every warp and weft of our existence.",
+            "v1Title": "Heritage Preservation",
+            "v1Desc": "Keeping the ancient art of Muslin weaving alive in its purest form, passed down through generations in Murshidabad.",
+            "v2Title": "Artisan Empowerment",
+            "v2Desc": "Ensuring fair chances and sustainable livelihoods for our community of weavers under KVIC certification.",
+            "v3Title": "Eco-Conscious",
+            "v3Desc": "Using only natural fibers and traditional hand-operated looms that leave zero carbon footprint."
+        },
+        "cta": {
+            "title": "Experience the Authenticity",
+            "description": "Visit us in Murshidabad to see the magic unfold, or bring a piece of heritage home today.",
+            "shop": "Shop Collection",
+            "contact": "Contact Us"
+        }
+    },
+    "Contact": {
+        "hero": {
+            "badge": "Get in Touch",
+            "title": "We'd Love to Hear From You",
+            "description": "Whether you are looking for a specific weave, want to place a bulk order, or simply want to visit our weavers in Murshidabad."
+        },
+        "info": {
+            "title": "Contact Information",
+            "location": "Our Location",
+            "address": "Nabagram Seva Sangha, Vill. & P.O. - Nabagram, Dist. - Murshidabad, West Bengal, 742136",
+            "phone": "Phone",
+            "email": "Email",
+            "hours": "Visiting Hours",
+            "hoursDetail": "Mon - Sat: 10:00 AM - 6:00 PM",
+            "sunday": "Sunday: Closed"
+        }
+    },
+    "ContactForm": {
+        "title": "Send us a Message",
+        "subtitle": "We usually respond within 24 hours.",
+        "name": "Full Name",
+        "email": "Email Address",
+        "subject": "Subject",
+        "message": "Message",
+        "placeholderName": "John Doe",
+        "placeholderEmail": "john@example.com",
+        "placeholderMessage": "Tell us what you're looking for...",
+        "subjects": {
+            "general": "General Inquiry",
+            "bulk": "Bulk Order",
+            "custom": "Custom Weave Request",
+            "visit": "Visit Request"
+        },
+        "send": "Send Message",
+        "sending": "Sending...",
+        "success": "Message Sent!",
+        "error": "Failed to send message",
+        "unexpectedError": "An unexpected error occurred"
+    },
+    "Footer": {
+        "brand": "Nabagram",
+        "kvic": "Seva Sangha (KVIC)",
+        "desc": "Preserving the heritage of handwoven textiles. Our artisan community of 28 spinners and 13 weavers craft premium muslin and silk with generations of expertise.",
+        "linksTitle": "Quick Links",
+        "contactTitle": "Contact Us",
+        "findTitle": "Find Us",
+        "rights": "© {year} Nabagram Seva Sangha. All rights reserved.",
+        "links": {
+            "collections": "All Collections",
+            "muslin": "Cotton Muslin",
+            "silk": "Silk Sarees",
+            "heritage": "Our Heritage",
+            "contact": "Contact Us",
+            "privacy": "Privacy Policy",
+            "terms": "Terms of Service",
+            "shipping": "Shipping & Returns"
+        }
+    },
+    "AdminSidebar": {
+        "panel": "Admin Panel",
+        "dashboard": "Dashboard",
+        "products": "Products",
+        "orders": "Orders",
+        "users": "Users",
+        "analytics": "Analytics",
+        "settings": "Settings",
+        "viewStore": "View Store",
+        "signOut": "Sign Out"
+    },
+    "AdminDashboard": {
+        "title": "Dashboard",
+        "welcome": "Welcome back! Here's what's happening with your store.",
+        "stats": {
+            "revenue": "Total Revenue",
+            "orders": "Total Orders",
+            "products": "Total Products",
+            "customers": "Total Customers"
+        },
+        "recentOrders": {
+            "title": "Recent Orders",
+            "viewAll": "View All",
+            "orderId": "Order ID",
+            "customer": "Customer",
+            "product": "Product",
+            "amount": "Amount",
+            "status": "Status"
+        },
+        "lowStock": {
+            "title": "Low Stock Alert",
+            "leftInStock": "{count} left in stock",
+            "restock": "Restock",
+            "manage": "Manage Inventory"
+        },
+        "items": "{count} {count, plural, =1 {item} other {items}}"
+    },
+    "Account": {
+        "orderHistory": "Order History",
+        "ordersTotal": "{count} orders total",
+        "noOrders": "No orders yet",
+        "noOrdersDesc": "Explore our collections and place your first order.",
+        "browse": "Browse Products",
+        "orderNumber": "Order #{id}",
+        "items": "{count} {count, plural, =1 {item} other {items}}"
+    },
+    "AdminProducts": {
+        "title": "Products",
+        "subtitle": "Manage your product inventory",
+        "add": "Add Product",
+        "search": "Search products...",
+        "allTypes": "All Types",
+        "table": {
+            "product": "Product",
+            "type": "Type",
+            "price": "Price",
+            "stock": "Stock",
+            "featured": "Featured",
+            "actions": "Actions"
+        },
+        "loading": "Loading products...",
+        "noProducts": "No products found"
+    },
+    "AdminOrders": {
+        "title": "Orders",
+        "subtitle": "Track and manage customer orders",
+        "stats": {
+            "total": "Total Orders",
+            "pending": "Pending",
+            "processing": "Processing",
+            "completed": "Completed"
+        },
+        "search": "Search by order ID or customer...",
+        "allStatus": "All Status",
+        "table": {
+            "orderId": "Order ID",
+            "customer": "Customer",
+            "items": "Items",
+            "total": "Total",
+            "status": "Status",
+            "date": "Date",
+            "actions": "Actions"
+        },
+        "view": "View",
+        "ship": "Ship"
+    },
+    "AdminUsers": {
+        "title": "User Management",
+        "subtitle": "Manage your store customers and staff members.",
+        "add": "Add New User",
+        "allUsers": "All Users",
+        "search": "Search users...",
+        "table": {
+            "user": "User",
+            "role": "Role",
+            "joined": "Joined",
+            "actions": "Actions"
+        }
+    },
+    "AdminAnalytics": {
+        "title": "Analytics",
+        "subtitle": "Detailed insights into your store performance and sales.",
+        "thisMonth": "This Month",
+        "export": "Export Report",
+        "revenueOverview": "Revenue Overview",
+        "categoryDistribution": "Category Distribution",
+        "salesByRegion": "Sales by Region",
+        "customerGrowth": "Customer Growth",
+        "comingSoon": "Data visualization will be integrated here."
+    },
+    "AdminSettings": {
+        "title": "Settings",
+        "subtitle": "Configure your store preferences, security, and notifications.",
+        "nav": {
+            "general": "General",
+            "notifications": "Notifications",
+            "security": "Security",
+            "payments": "Payments"
+        },
+        "upload": {
+            "title": "Image Upload Settings",
+            "desc": "Configure how images are processed during upload.",
+            "optimize": "Auto-Optimize Large Images",
+            "optimizeDesc": "Automatically convert images > {threshold}MB to high-quality WebP.",
+            "threshold": "Optimization Threshold",
+            "thresholdDesc": "MB (Files larger than this will trigger optimization)"
+        },
+        "cloudinary": {
+            "title": "Cloudinary Usage Tip",
+            "desc": "Free plan limit is usually 25 Transformation Credits or 25GB Storage. Enabling optimization saves storage space and transformation credits."
+        },
+        "storeInfo": {
+            "title": "Store Information",
+            "desc": "Update your store details and contact info.",
+            "name": "Store Name",
+            "email": "Support Email",
+            "description": "Store Description"
+        },
+        "localization": {
+            "title": "Currency & Localization",
+            "desc": "Setup your preferred currency and timezone.",
+            "currency": "Currency",
+            "timezone": "Timezone"
+        },
+        "cancel": "Cancel",
+        "save": "Save Changes"
+    }
+}

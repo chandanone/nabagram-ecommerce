@@ -1,21 +1,26 @@
-import Link from "next/link";
+"use client";
+
+import { Link } from "@/i18n/routing";
 import { Mail, Phone, MapPin, Instagram, Facebook, Twitter } from "lucide-react";
-
-const quickLinks = [
-    { href: "/products", label: "All Collections" },
-    { href: "/products?type=MUSLIN", label: "Cotton Muslin" },
-    { href: "/products?type=SILK_SAREE", label: "Silk Sarees" },
-    { href: "/about", label: "Our Heritage" },
-    { href: "/contact", label: "Contact Us" },
-];
-
-const legalLinks = [
-    { href: "/privacy", label: "Privacy Policy" },
-    { href: "/terms", label: "Terms of Service" },
-    { href: "/shipping", label: "Shipping & Returns" },
-];
+import { useTranslations } from "next-intl";
 
 export function Footer() {
+    const t = useTranslations("Footer");
+
+    const quickLinks = [
+        { href: "/products", label: t("links.collections") },
+        { href: "/products?type=MUSLIN", label: t("links.muslin") },
+        { href: "/products?type=SILK_SAREE", label: t("links.silk") },
+        { href: "/about", label: t("links.heritage") },
+        { href: "/contact", label: t("links.contact") },
+    ];
+
+    const legalLinks = [
+        { href: "/privacy", label: t("links.privacy") },
+        { href: "/terms", label: t("links.terms") },
+        { href: "/shipping", label: t("links.shipping") },
+    ];
+
     return (
         <footer className="bg-[var(--silk-indigo)] text-white">
             {/* Main Footer */}
@@ -28,13 +33,12 @@ export function Footer() {
                                 N
                             </div>
                             <div>
-                                <h3 className="text-lg font-bold leading-tight">Nabagram</h3>
-                                <p className="text-sm text-white/60">Seva Sangha (KVIC)</p>
+                                <h3 className="text-lg font-bold leading-tight">{t("brand")}</h3>
+                                <p className="text-sm text-white/60">{t("kvic")}</p>
                             </div>
                         </div>
                         <p className="text-white/70 text-sm leading-relaxed mb-6">
-                            Preserving the heritage of handwoven textiles. Our artisan community of 28 spinners
-                            and 13 weavers craft premium muslin and silk with generations of expertise.
+                            {t("desc")}
                         </p>
                         <div className="flex gap-4">
                             <a
@@ -60,12 +64,12 @@ export function Footer() {
 
                     {/* Quick Links */}
                     <div>
-                        <h4 className="font-semibold text-lg mb-6">Quick Links</h4>
+                        <h4 className="font-semibold text-lg mb-6">{t("linksTitle")}</h4>
                         <ul className="space-y-3">
                             {quickLinks.map((link) => (
                                 <li key={link.href}>
                                     <Link
-                                        href={link.href}
+                                        href={link.href as any}
                                         className="text-white/70 hover:text-[var(--deep-saffron)] transition-colors text-sm"
                                     >
                                         {link.label}
@@ -77,7 +81,7 @@ export function Footer() {
 
                     {/* Contact Info */}
                     <div>
-                        <h4 className="font-semibold text-lg mb-6">Contact Us</h4>
+                        <h4 className="font-semibold text-lg mb-6">{t("contactTitle")}</h4>
                         <ul className="space-y-4">
                             <li className="flex gap-3 text-sm">
                                 <MapPin className="h-5 w-5 text-[var(--deep-saffron)] flex-shrink-0 mt-0.5" />
@@ -110,7 +114,7 @@ export function Footer() {
 
                     {/* Map */}
                     <div>
-                        <h4 className="font-semibold text-lg mb-6">Find Us</h4>
+                        <h4 className="font-semibold text-lg mb-6">{t("findTitle")}</h4>
                         <div className="rounded-xl overflow-hidden h-48">
                             <iframe
                                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3634.851567892345!2d88.2673!3d24.1234!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sKanfala%2C%20Murshidabad!5e0!3m2!1sen!2sin!4v1234567890"
@@ -131,13 +135,13 @@ export function Footer() {
             <div className="border-t border-white/10">
                 <div className="container py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <p className="text-white/60 text-sm">
-                        © {new Date().getFullYear()} Nabagram Seva Sangha. All rights reserved.
+                        {t("rights", { year: new Date().getFullYear() })}
                     </p>
                     <div className="flex gap-6">
                         {legalLinks.map((link) => (
                             <Link
                                 key={link.href}
-                                href={link.href}
+                                href={link.href as any}
                                 className="text-white/60 hover:text-white text-sm transition-colors"
                             >
                                 {link.label}
@@ -149,3 +153,4 @@ export function Footer() {
         </footer>
     );
 }
+

@@ -5,7 +5,10 @@ import { BarChart3, TrendingUp, Calendar, Download, PieChart, LineChart } from "
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
+import { useTranslations } from "next-intl";
+
 export default function AnalyticsPage() {
+    const t = useTranslations("AdminAnalytics");
     return (
         <div className="space-y-8">
             <motion.div
@@ -15,18 +18,18 @@ export default function AnalyticsPage() {
             >
                 <div>
                     <h1 className="text-3xl font-bold text-[var(--silk-indigo)] mb-2">
-                        Analytics
+                        {t("title")}
                     </h1>
                     <p className="text-[var(--muted)]">
-                        Detailed insights into your store performance and sales.
+                        {t("subtitle")}
                     </p>
                 </div>
                 <div className="flex gap-3">
                     <Button variant="outline" className="gap-2 border-[var(--warm-gray)]/30">
-                        <Calendar className="h-4 w-4" /> This Month
+                        <Calendar className="h-4 w-4" /> {t("thisMonth")}
                     </Button>
                     <Button className="gap-2 bg-[var(--charcoal)] hover:bg-[var(--charcoal)]/90 text-white">
-                        <Download className="h-4 w-4" /> Export Report
+                        <Download className="h-4 w-4" /> {t("export")}
                     </Button>
                 </div>
             </motion.div>
@@ -36,13 +39,13 @@ export default function AnalyticsPage() {
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <TrendingUp className="h-5 w-5 text-green-500" />
-                            Revenue Overview
+                            {t("revenueOverview")}
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="h-[300px] flex items-center justify-center border-t border-[var(--warm-gray)]/10">
                         <div className="text-center">
                             <LineChart className="h-12 w-12 text-[var(--warm-gray)]/30 mx-auto mb-4" />
-                            <p className="text-[var(--muted)]">Revenue chart will be integrated here.</p>
+                            <p className="text-[var(--muted)]">{t("comingSoon")}</p>
                         </div>
                     </CardContent>
                 </Card>
@@ -51,13 +54,13 @@ export default function AnalyticsPage() {
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <PieChart className="h-5 w-5 text-blue-500" />
-                            Category Distribution
+                            {t("categoryDistribution")}
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="h-[300px] flex items-center justify-center border-t border-[var(--warm-gray)]/10">
                         <div className="text-center">
                             <PieChart className="h-12 w-12 text-[var(--warm-gray)]/30 mx-auto mb-4" />
-                            <p className="text-[var(--muted)]">Product categories data.</p>
+                            <p className="text-[var(--muted)]">{t("comingSoon")}</p>
                         </div>
                     </CardContent>
                 </Card>
@@ -68,22 +71,22 @@ export default function AnalyticsPage() {
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <BarChart3 className="h-5 w-5 text-purple-500" />
-                            Sales by Region
+                            {t("salesByRegion")}
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="h-[250px] flex items-center justify-center">
-                        <p className="text-[var(--muted)]">Regional performance data.</p>
+                        <p className="text-[var(--muted)]">{t("comingSoon")}</p>
                     </CardContent>
                 </Card>
                 <Card className="glass">
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                             <TrendingUp className="h-5 w-5 text-orange-500" />
-                            Customer Growth
+                            {t("customerGrowth")}
                         </CardTitle>
                     </CardHeader>
                     <CardContent className="h-[250px] flex items-center justify-center">
-                        <p className="text-[var(--muted)]">Monthly user acquisition trends.</p>
+                        <p className="text-[var(--muted)]">{t("comingSoon")}</p>
                     </CardContent>
                 </Card>
             </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ShoppingBag, User, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,15 +9,11 @@ import { useSession } from "next-auth/react";
 import { LoginModal } from "@/components/auth/login-modal";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { useCart } from "@/lib/cart";
-
-const navLinks = [
-    { href: "/", label: "Home" },
-    { href: "/products", label: "Collections" },
-    { href: "/about", label: "Our Heritage" },
-    { href: "/contact", label: "Contact" },
-];
+import { useTranslations } from "next-intl";
+import { LanguageSwitcher } from "./language-switcher";
 
 export function Header() {
+    const t = useTranslations("Header");
     const [isOpen, setIsOpen] = React.useState(false);
     const [isScrolled, setIsScrolled] = React.useState(false);
     const [showLogin, setShowLogin] = React.useState(false);
@@ -25,6 +21,13 @@ export function Header() {
     const [count, setCount] = React.useState(0);
     const { data: session } = useSession();
     const items = useCart((state) => state.items);
+
+    const navLinks = [
+        { href: "/", label: t("home") },
+        { href: "/products", label: t("collections") },
+        { href: "/about", label: t("ourHeritage") },
+        { href: "/contact", label: t("contact") },
+    ];
 
     React.useEffect(() => {
         setMounted(true);
@@ -61,10 +64,10 @@ export function Header() {
                             </div>
                             <div className="hidden sm:block">
                                 <h1 className="text-lg font-bold text-[var(--silk-indigo)] leading-tight">
-                                    Nabagram
+                                    {t("nabagram")}
                                 </h1>
                                 <p className="text-xs text-[var(--muted)] -mt-0.5">
-                                    Seva Sangha
+                                    {t("sevaSangha")}
                                 </p>
                             </div>
                         </Link>
@@ -74,7 +77,7 @@ export function Header() {
                             {navLinks.map((link) => (
                                 <Link
                                     key={link.href}
-                                    href={link.href}
+                                    href={link.href as any}
                                     className="text-[var(--silk-indigo)] font-medium relative group"
                                 >
                                     {link.label}
@@ -85,13 +88,17 @@ export function Header() {
 
                         {/* Actions */}
                         <div className="flex items-center gap-3">
+                            <LanguageSwitcher />
+
                             <Button variant="ghost" size="icon" className="hidden sm:flex">
                                 <Search className="h-5 w-5" />
+                                <span className="sr-only">{t("search")}</span>
                             </Button>
 
                             <Link href="/cart">
                                 <Button variant="ghost" size="icon" className="relative">
                                     <ShoppingBag className="h-5 w-5" />
+                                    <span className="sr-only">{t("cart")}</span>
                                     {mounted && count > 0 && (
                                         <span className="absolute -top-1 -right-1 w-5 h-5 bg-[var(--deep-saffron)] text-white text-xs rounded-full flex items-center justify-center">
                                             {count}
@@ -114,7 +121,7 @@ export function Header() {
                                         className="hidden sm:flex"
                                         showIcon={true}
                                     >
-                                        <span className="sr-only">Sign Out</span>
+                                        <span className="sr-only">{t("signOut")}</span>
                                     </SignOutButton>
                                 </div>
                             ) : (
@@ -124,7 +131,7 @@ export function Header() {
                                     className="hidden sm:flex"
                                     onClick={() => setShowLogin(true)}
                                 >
-                                    Sign In
+                                    {t("signIn")}
                                 </Button>
                             )}
 
@@ -154,7 +161,7 @@ export function Header() {
                                 {navLinks.map((link) => (
                                     <Link
                                         key={link.href}
-                                        href={link.href}
+                                        href={link.href as any}
                                         className="text-white font-medium text-lg py-2 border-b border-white/10"
                                         onClick={() => setIsOpen(false)}
                                     >
@@ -166,7 +173,7 @@ export function Header() {
                                         <Link href="/account" onClick={() => setIsOpen(false)}>
                                             <Button variant="glass" className="w-full justify-start gap-3">
                                                 <User className="h-4 w-4" />
-                                                My Account
+                                                {t("myAccount")}
                                             </Button>
                                         </Link>
                                         <SignOutButton
@@ -183,7 +190,7 @@ export function Header() {
                                             setShowLogin(true);
                                         }}
                                     >
-                                        Sign In
+                                        {t("signIn")}
                                     </Button>
                                 )}
                             </div>
@@ -196,3 +203,4 @@ export function Header() {
         </>
     );
 }
+

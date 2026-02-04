@@ -5,9 +5,9 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-export function formatPrice(price: number | string): string {
+export function formatPrice(price: number | string, locale = "en-IN"): string {
     const numericPrice = typeof price === "string" ? parseFloat(price) : price;
-    return new Intl.NumberFormat("en-IN", {
+    return new Intl.NumberFormat(locale, {
         style: "currency",
         currency: "INR",
         minimumFractionDigits: 0,
@@ -65,3 +65,12 @@ export async function convertToWebP(file: File, quality = 0.95): Promise<Blob> {
     });
 }
 
+export function toBengaliDigits(num: number | string): string {
+    const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+    return num.toString().replace(/\d/g, d => bengaliDigits[parseInt(d)]);
+}
+
+export function fromBengaliDigits(str: string): string {
+    const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+    return str.replace(/[০-৯]/g, d => bengaliDigits.indexOf(d).toString());
+}

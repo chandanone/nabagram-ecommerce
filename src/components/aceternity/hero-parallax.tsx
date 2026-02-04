@@ -14,9 +14,21 @@ interface Product {
 
 interface HeroParallaxProps {
     products: Product[];
+    title?: string;
+    badge?: string;
+    description?: string;
+    exploreLabel?: string;
+    storyLabel?: string;
 }
 
-export function HeroParallax({ products }: HeroParallaxProps) {
+export function HeroParallax({
+    products,
+    title,
+    badge,
+    description,
+    exploreLabel,
+    storyLabel
+}: HeroParallaxProps) {
     const firstRow = products.slice(0, 5);
     const secondRow = products.slice(5, 10);
     const thirdRow = products.slice(10, 15);
@@ -59,7 +71,13 @@ export function HeroParallax({ products }: HeroParallaxProps) {
             ref={ref}
             className="h-[300vh] py-40 overflow-hidden antialiased relative flex flex-col self-auto [perspective:1000px] [transform-style:preserve-3d]"
         >
-            <Header />
+            <Header
+                title={title}
+                badge={badge}
+                description={description}
+                exploreLabel={exploreLabel}
+                storyLabel={storyLabel}
+            />
             <motion.div
                 style={{
                     rotateX,
@@ -101,7 +119,19 @@ export function HeroParallax({ products }: HeroParallaxProps) {
     );
 }
 
-function Header() {
+function Header({
+    title,
+    badge,
+    description,
+    exploreLabel,
+    storyLabel
+}: {
+    title?: string;
+    badge?: string;
+    description?: string;
+    exploreLabel?: string;
+    storyLabel?: string;
+}) {
     return (
         <div className="max-w-7xl relative mx-auto py-20 md:py-40 px-4 w-full left-0 top-0">
             <motion.div
@@ -110,29 +140,27 @@ function Header() {
                 transition={{ duration: 0.8 }}
             >
                 <p className="text-[var(--deep-saffron)] font-medium mb-4 tracking-wider uppercase text-sm">
-                    Heritage Handwoven Textiles
+                    {badge || "Heritage Handwoven Textiles"}
                 </p>
                 <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-[var(--silk-indigo)] leading-tight">
-                    Nabagram <br />
-                    <span className="text-gradient">Seva Sangha</span>
+                    {title || "Nabagram Seva Sangha"}
                 </h1>
                 <p className="max-w-2xl text-lg md:text-xl mt-8 text-[var(--muted)]">
-                    Discover the timeless elegance of handwoven muslin and silk,
-                    crafted by 28 master spinners and 13 skilled weavers from the
-                    heart of Murshidabad.
+                    {description || "Discover the timeless elegance of handwoven muslin and silk, crafted by master artisans from Murshidabad."}
                 </p>
                 <div className="flex gap-4 mt-10">
                     <Link href="/products">
-                        <Button size="xl">Explore Collections</Button>
+                        <Button size="xl">{exploreLabel || "Explore Collections"}</Button>
                     </Link>
                     <Link href="/about">
-                        <Button variant="outline" size="xl">Our Story</Button>
+                        <Button variant="outline" size="xl">{storyLabel || "Our Story"}</Button>
                     </Link>
                 </div>
             </motion.div>
         </div>
     );
 }
+
 
 import { MotionValue } from "framer-motion";
 

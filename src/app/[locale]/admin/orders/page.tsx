@@ -25,18 +25,27 @@ const demoOrders = [
     { id: "ORD006", customer: "Amit Singh", email: "amit@email.com", items: 1, total: 35000, status: "CANCELLED", date: "2024-01-23" },
 ];
 
-const statusConfig = {
-    PENDING: { label: "Pending", icon: Clock, color: "bg-gray-100 text-gray-700" },
-    PAID: { label: "Paid", icon: CheckCircle, color: "bg-yellow-100 text-yellow-700" },
-    PROCESSING: { label: "Processing", icon: Clock, color: "bg-blue-100 text-blue-700" },
-    SHIPPED: { label: "Shipped", icon: Truck, color: "bg-purple-100 text-purple-700" },
-    DELIVERED: { label: "Delivered", icon: CheckCircle, color: "bg-green-100 text-green-700" },
-    CANCELLED: { label: "Cancelled", icon: XCircle, color: "bg-red-100 text-red-700" },
-};
+import { useTranslations } from "next-intl";
 
 export default function AdminOrdersPage() {
+    const t = useTranslations("AdminOrders");
+    const tCommon = useTranslations("Common");
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState("");
+
+    const statusConfig = {
+        PENDING: { label: tCommon("status.PENDING"), icon: Clock, color: "bg-gray-100 text-gray-700" },
+        PAID: { label: tCommon("status.PAID"), icon: CheckCircle, color: "bg-yellow-100 text-yellow-700" },
+        PROCESSING: { label: tCommon("status.PROCESSING"), icon: Clock, color: "bg-blue-100 text-blue-700" },
+        SHIPPED: { label: tCommon("status.SHIPPED"), icon: Truck, color: "bg-purple-100 text-purple-700" },
+        DELIVERED: { label: tCommon("status.DELIVERED"), icon: CheckCircle, color: "bg-green-100 text-green-700" },
+        CANCELLED: { label: tCommon("status.CANCELLED"), icon: XCircle, color: "bg-red-100 text-red-700" },
+    };
+
+    // Correcting statusConfig labels better
+    const getStatusLabel = (status: string) => {
+        return tCommon(`status.${status}`);
+    }
 
     const filteredOrders = demoOrders.filter((order) => {
         const matchesSearch =
@@ -53,20 +62,20 @@ export default function AdminOrdersPage() {
                 animate={{ opacity: 1, y: 0 }}
             >
                 <h1 className="text-3xl font-bold text-[var(--silk-indigo)] mb-2">
-                    Orders
+                    {t("title")}
                 </h1>
                 <p className="text-[var(--muted)]">
-                    Track and manage customer orders
+                    {t("subtitle")}
                 </p>
             </motion.div>
 
             {/* Stats */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
-                    { label: "Total Orders", value: demoOrders.length },
-                    { label: "Pending", value: demoOrders.filter(o => o.status === "PENDING" || o.status === "PAID").length },
-                    { label: "Processing", value: demoOrders.filter(o => o.status === "PROCESSING" || o.status === "SHIPPED").length },
-                    { label: "Completed", value: demoOrders.filter(o => o.status === "DELIVERED").length },
+                    { label: t("stats.total"), value: demoOrders.length },
+                    { label: t("stats.pending"), value: demoOrders.filter(o => o.status === "PENDING" || o.status === "PAID").length },
+                    { label: t("stats.processing"), value: demoOrders.filter(o => o.status === "PROCESSING" || o.status === "SHIPPED").length },
+                    { label: t("stats.completed"), value: demoOrders.filter(o => o.status === "DELIVERED").length },
                 ].map((stat) => (
                     <Card key={stat.label} className="glass">
                         <CardContent className="p-4 text-center">
@@ -84,7 +93,7 @@ export default function AdminOrdersPage() {
                         <div className="flex-1 relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted)]" />
                             <Input
-                                placeholder="Search by order ID or customer..."
+                                placeholder={t("search")}
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 className="pl-10"
@@ -95,13 +104,13 @@ export default function AdminOrdersPage() {
                             onChange={(e) => setStatusFilter(e.target.value)}
                             className="h-11 px-4 rounded-lg border border-[var(--warm-gray)]/30 bg-white text-[var(--silk-indigo)] focus:outline-none focus:ring-2 focus:ring-[var(--deep-saffron)]"
                         >
-                            <option value="">All Status</option>
-                            <option value="PENDING">Pending</option>
-                            <option value="PAID">Paid</option>
-                            <option value="PROCESSING">Processing</option>
-                            <option value="SHIPPED">Shipped</option>
-                            <option value="DELIVERED">Delivered</option>
-                            <option value="CANCELLED">Cancelled</option>
+                            <option value="">{t("allStatus")}</option>
+                            <option value="PENDING">{tCommon("status.PENDING")}</option>
+                            <option value="PAID">{tCommon("status.PAID")}</option>
+                            <option value="PROCESSING">{tCommon("status.PROCESSING")}</option>
+                            <option value="SHIPPED">{tCommon("status.SHIPPED")}</option>
+                            <option value="DELIVERED">{tCommon("status.DELIVERED")}</option>
+                            <option value="CANCELLED">{tCommon("status.CANCELLED")}</option>
                         </select>
                     </div>
                 </CardContent>
@@ -114,18 +123,18 @@ export default function AdminOrdersPage() {
                         <table className="w-full">
                             <thead>
                                 <tr className="border-b border-[var(--warm-gray)]/20">
-                                    <th className="text-left p-4 text-sm font-medium text-[var(--muted)]">Order ID</th>
-                                    <th className="text-left p-4 text-sm font-medium text-[var(--muted)]">Customer</th>
-                                    <th className="text-center p-4 text-sm font-medium text-[var(--muted)]">Items</th>
-                                    <th className="text-right p-4 text-sm font-medium text-[var(--muted)]">Total</th>
-                                    <th className="text-center p-4 text-sm font-medium text-[var(--muted)]">Status</th>
-                                    <th className="text-left p-4 text-sm font-medium text-[var(--muted)]">Date</th>
-                                    <th className="text-right p-4 text-sm font-medium text-[var(--muted)]">Actions</th>
+                                    <th className="text-left p-4 text-sm font-medium text-[var(--muted)]">{t("table.orderId")}</th>
+                                    <th className="text-left p-4 text-sm font-medium text-[var(--muted)]">{t("table.customer")}</th>
+                                    <th className="text-center p-4 text-sm font-medium text-[var(--muted)]">{t("table.items")}</th>
+                                    <th className="text-right p-4 text-sm font-medium text-[var(--muted)]">{t("table.total")}</th>
+                                    <th className="text-center p-4 text-sm font-medium text-[var(--muted)]">{t("table.status")}</th>
+                                    <th className="text-left p-4 text-sm font-medium text-[var(--muted)]">{t("table.date")}</th>
+                                    <th className="text-right p-4 text-sm font-medium text-[var(--muted)]">{t("table.actions")}</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {filteredOrders.map((order) => {
-                                    const status = statusConfig[order.status as keyof typeof statusConfig];
+                                    const statusObj = statusConfig[order.status as keyof typeof statusConfig];
                                     return (
                                         <tr key={order.id} className="border-b border-[var(--warm-gray)]/10 last:border-0 hover:bg-[var(--cream)]/50 transition-colors">
                                             <td className="p-4 font-medium text-[var(--silk-indigo)]">{order.id}</td>
@@ -138,9 +147,9 @@ export default function AdminOrdersPage() {
                                             <td className="p-4 text-center">{order.items}</td>
                                             <td className="p-4 text-right font-medium">{formatPrice(order.total)}</td>
                                             <td className="p-4 text-center">
-                                                <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${status.color}`}>
-                                                    <status.icon className="h-3 w-3" />
-                                                    {status.label}
+                                                <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${statusObj.color}`}>
+                                                    <statusObj.icon className="h-3 w-3" />
+                                                    {getStatusLabel(order.status)}
                                                 </span>
                                             </td>
                                             <td className="p-4 text-[var(--muted)] text-sm">{order.date}</td>
@@ -148,12 +157,12 @@ export default function AdminOrdersPage() {
                                                 <div className="flex justify-end gap-2">
                                                     <Button variant="ghost" size="sm" className="gap-1">
                                                         <Eye className="h-4 w-4" />
-                                                        View
+                                                        {t("view")}
                                                     </Button>
                                                     {order.status === "PAID" && (
                                                         <Button variant="outline" size="sm" className="gap-1">
                                                             <Truck className="h-4 w-4" />
-                                                            Ship
+                                                            {t("ship")}
                                                         </Button>
                                                     )}
                                                 </div>
