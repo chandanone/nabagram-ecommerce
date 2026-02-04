@@ -14,7 +14,10 @@ const users = [
     { id: "5", name: "Suresh Kumar", email: "suresh@example.com", role: "USER", joined: "Jan 20, 2024" },
 ];
 
+import { useTranslations } from "next-intl";
+
 export default function UsersPage() {
+    const t = useTranslations("AdminUsers");
     return (
         <div className="space-y-8">
             <motion.div
@@ -24,24 +27,24 @@ export default function UsersPage() {
             >
                 <div>
                     <h1 className="text-3xl font-bold text-[var(--silk-indigo)] mb-2">
-                        User Management
+                        {t("title")}
                     </h1>
                     <p className="text-[var(--muted)]">
-                        Manage your store customers and staff members.
+                        {t("subtitle")}
                     </p>
                 </div>
                 <Button className="gap-2 bg-[var(--deep-saffron)] hover:bg-[var(--deep-saffron)]/90 text-white">
-                    <UserPlus className="h-4 w-4" /> Add New User
+                    <UserPlus className="h-4 w-4" /> {t("add")}
                 </Button>
             </motion.div>
 
             <Card className="glass">
                 <CardHeader>
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <CardTitle>All Users</CardTitle>
+                        <CardTitle>{t("allUsers")}</CardTitle>
                         <div className="relative w-full sm:w-64">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted)]" />
-                            <Input placeholder="Search users..." className="pl-10 h-10 focus-visible:ring-[var(--deep-saffron)]" />
+                            <Input placeholder={t("search")} className="pl-10 h-10 focus-visible:ring-[var(--deep-saffron)]" />
                         </div>
                     </div>
                 </CardHeader>
@@ -50,10 +53,10 @@ export default function UsersPage() {
                         <table className="w-full">
                             <thead>
                                 <tr className="border-b border-[var(--warm-gray)]/20 text-[var(--muted)] text-sm">
-                                    <th className="text-left pb-4 font-medium">User</th>
-                                    <th className="text-left pb-4 font-medium">Role</th>
-                                    <th className="text-left pb-4 font-medium">Joined</th>
-                                    <th className="text-right pb-4 font-medium">Actions</th>
+                                    <th className="text-left pb-4 font-medium">{t("table.user")}</th>
+                                    <th className="text-left pb-4 font-medium">{t("table.role")}</th>
+                                    <th className="text-left pb-4 font-medium">{t("table.joined")}</th>
+                                    <th className="text-right pb-4 font-medium">{t("table.actions")}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -72,10 +75,10 @@ export default function UsersPage() {
                                         </td>
                                         <td className="py-4">
                                             <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${user.role === "ADMIN"
-                                                    ? "bg-purple-100 text-purple-700"
-                                                    : user.role === "SALESPERSON"
-                                                        ? "bg-blue-100 text-blue-700"
-                                                        : "bg-green-100 text-green-700"
+                                                ? "bg-purple-100 text-purple-700"
+                                                : user.role === "SALESPERSON"
+                                                    ? "bg-blue-100 text-blue-700"
+                                                    : "bg-green-100 text-green-700"
                                                 }`}>
                                                 <Shield className="h-3 w-3" />
                                                 {user.role}

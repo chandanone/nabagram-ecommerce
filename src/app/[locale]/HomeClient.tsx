@@ -6,11 +6,12 @@ import { StatCard } from "@/components/aceternity/count-up";
 import { ProductCard } from "@/components/products/product-card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Heart, Award, Leaf } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import Image from "next/image";
 import { SafeProduct } from "@/lib/types";
 import { useCart } from "@/lib/cart";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 interface HomeClientProps {
     featuredProducts: SafeProduct[];
@@ -36,6 +37,8 @@ const heroProducts = [
 ];
 
 export default function HomeClient({ featuredProducts }: HomeClientProps) {
+    const t = useTranslations("Home");
+    const c = useTranslations("Common");
     const { addItem } = useCart();
 
     const handleAddToCart = (product: SafeProduct) => {
@@ -47,13 +50,20 @@ export default function HomeClient({ featuredProducts }: HomeClientProps) {
             fabricType: product.fabricType.toString(),
             fabricCount: product.fabricCount || undefined,
         });
-        toast.success(`${product.name} added to cart`);
+        toast.success(c("successAdded", { name: product.name }));
     };
 
     return (
         <div className="-mt-20">
             {/* Hero Parallax Section */}
-            <HeroParallax products={heroProducts} />
+            <HeroParallax
+                products={heroProducts}
+                title={t("hero.title")}
+                badge={t("hero.badge")}
+                description={t("hero.description")}
+                exploreLabel={t("hero.explore")}
+                storyLabel={t("hero.story")}
+            />
 
             {/* Artisan Pulse Section */}
             <section className="section bg-white relative overflow-hidden">
@@ -66,41 +76,40 @@ export default function HomeClient({ featuredProducts }: HomeClientProps) {
                         className="text-center mb-16"
                     >
                         <p className="text-[var(--deep-saffron)] font-medium tracking-wider uppercase text-sm mb-4">
-                            Our Artisan Community
+                            {t("artisan.badge")}
                         </p>
                         <h2 className="text-3xl md:text-5xl font-bold text-[var(--silk-indigo)] mb-4">
-                            The Pulse of <span className="text-gradient">Tradition</span>
+                            {t("artisan.title")}
                         </h2>
                         <p className="text-[var(--muted)] max-w-2xl mx-auto">
-                            Behind every thread lies the dedication of our master craftspeople,
-                            preserving techniques passed down through generations.
+                            {t("artisan.description")}
                         </p>
                     </motion.div>
 
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
                         <StatCard
                             value={28}
-                            label="Master Spinners"
+                            label={t("artisan.masterSpinners")}
                             icon={<Sparkles className="h-6 w-6" />}
                             delay={0}
                         />
                         <StatCard
                             value={13}
-                            label="Skilled Weavers"
+                            label={t("artisan.skilledWeavers")}
                             icon={<Heart className="h-6 w-6" />}
                             delay={0.1}
                         />
                         <StatCard
                             value={50}
                             suffix="+"
-                            label="Years of Heritage"
+                            label={t("artisan.yearsOfHeritage")}
                             icon={<Award className="h-6 w-6" />}
                             delay={0.2}
                         />
                         <StatCard
                             value={100}
                             suffix="%"
-                            label="Handcrafted"
+                            label={t("artisan.handcrafted")}
                             icon={<Leaf className="h-6 w-6" />}
                             delay={0.3}
                         />
@@ -119,15 +128,15 @@ export default function HomeClient({ featuredProducts }: HomeClientProps) {
                     >
                         <div>
                             <p className="text-[var(--deep-saffron)] font-medium tracking-wider uppercase text-sm mb-4">
-                                Curated Selection
+                                {t("featured.badge")}
                             </p>
                             <h2 className="text-3xl md:text-4xl font-bold text-[var(--silk-indigo)]">
-                                Featured <span className="text-gradient">Collections</span>
+                                {t("featured.title")}
                             </h2>
                         </div>
                         <Link href="/products">
                             <Button variant="outline" className="mt-6 md:mt-0 gap-2">
-                                View All
+                                {t("featured.viewAll")}
                                 <ArrowRight className="h-4 w-4" />
                             </Button>
                         </Link>
@@ -160,26 +169,20 @@ export default function HomeClient({ featuredProducts }: HomeClientProps) {
                             viewport={{ once: true }}
                         >
                             <p className="text-[var(--saffron-light)] font-medium tracking-wider uppercase text-sm mb-4">
-                                Our Heritage
+                                {t("heritageStory.badge")}
                             </p>
                             <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                                Weaving Stories <br />
-                                <span className="text-[var(--saffron-light)]">Since Generations</span>
+                                {t("heritageStory.title")}
                             </h2>
                             <p className="text-white/70 mb-6 leading-relaxed">
-                                Nabagram Seva Sangha stands as a testament to the rich textile heritage
-                                of Murshidabad. Under the Khadi and Village Industries Commission (KVIC),
-                                we empower local artisans while preserving the ancient art of muslin and
-                                silk weaving.
+                                {t("heritageStory.description1")}
                             </p>
                             <p className="text-white/70 mb-8 leading-relaxed">
-                                From the finest 100-count muslin that once graced royal courts to
-                                intricately printed silk sarees, each piece tells a story of patience,
-                                skill, and unwavering dedication to quality.
+                                {t("heritageStory.description2")}
                             </p>
                             <Link href="/about">
                                 <Button variant="glass" size="lg" className="gap-2 text-white border-white/20 hover:bg-white/10">
-                                    Discover Our Story
+                                    {t("heritageStory.discoverStory")}
                                     <ArrowRight className="h-4 w-4" />
                                 </Button>
                             </Link>
@@ -201,9 +204,9 @@ export default function HomeClient({ featuredProducts }: HomeClientProps) {
                                 <div className="absolute inset-0 bg-gradient-to-t from-[var(--silk-indigo)] via-transparent to-transparent" />
                             </div>
                             <div className="absolute -bottom-6 -left-6 glass-saffron rounded-xl p-6 max-w-xs">
-                                <p className="font-bold text-2xl mb-1">KVIC Certified</p>
+                                <p className="font-bold text-2xl mb-1">{t("heritageStory.kvicCertified")}</p>
                                 <p className="text-white/80 text-sm">
-                                    Authentic Khadi products with government certification
+                                    {t("heritageStory.kvicDesc")}
                                 </p>
                             </div>
                         </motion.div>
@@ -221,16 +224,16 @@ export default function HomeClient({ featuredProducts }: HomeClientProps) {
                         className="text-center mb-12"
                     >
                         <p className="text-[var(--deep-saffron)] font-medium tracking-wider uppercase text-sm mb-4">
-                            Shop By Category
+                            {t("categories.badge")}
                         </p>
                         <h2 className="text-3xl md:text-4xl font-bold text-[var(--silk-indigo)]">
-                            Explore Our <span className="text-gradient">Collections</span>
+                            {t("categories.title")}
                         </h2>
                     </motion.div>
 
                     <div className="grid md:grid-cols-3 gap-6">
                         {[
-                            { title: "Cotton Muslin", desc: "60s to 100s count", href: "/products?type=MUSLIN", image: "https://images.unsplash.com/photo-1558171813-4c088753af8f?w=600&h=400&fit=crop" },
+                            { title: t("categories.title"), desc: "60s to 100s count", href: "/products?type=MUSLIN", image: "https://images.unsplash.com/photo-1558171813-4c088753af8f?w=600&h=400&fit=crop" },
                             { title: "Silk Sarees", desc: "Printed & Plain", href: "/products?type=SILK_SAREE", image: "https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=600&h=400&fit=crop" },
                             { title: "Silk Than", desc: "Premium Fabric", href: "/products?type=SILK_THAN", image: "https://images.unsplash.com/photo-1583391733956-6c78276477e2?w=600&h=400&fit=crop" },
                         ].map((category, index) => (
@@ -241,7 +244,7 @@ export default function HomeClient({ featuredProducts }: HomeClientProps) {
                                 viewport={{ once: true }}
                                 transition={{ delay: index * 0.1 }}
                             >
-                                <Link href={category.href} className="group block">
+                                <Link href={category.href as any} className="group block">
                                     <div className="relative aspect-[3/2] rounded-2xl overflow-hidden">
                                         <Image
                                             src={category.image}
@@ -274,19 +277,19 @@ export default function HomeClient({ featuredProducts }: HomeClientProps) {
                         className="text-center max-w-2xl mx-auto"
                     >
                         <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                            Join the Heritage Circle
+                            {t("newsletter.title")}
                         </h2>
                         <p className="text-white/80 mb-8">
-                            Be the first to know about new collections, artisan stories, and exclusive offers.
+                            {t("newsletter.description")}
                         </p>
                         <form className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
                             <input
                                 type="email"
-                                placeholder="Enter your email"
+                                placeholder={t("newsletter.placeholder")}
                                 className="flex-1 h-12 px-6 rounded-xl bg-white/20 border border-white/30 text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-white/50"
                             />
                             <Button variant="secondary" size="lg" className="bg-white text-[var(--deep-saffron)] hover:bg-white/90">
-                                Subscribe
+                                {t("newsletter.subscribe")}
                             </Button>
                         </form>
                     </motion.div>
@@ -295,3 +298,4 @@ export default function HomeClient({ featuredProducts }: HomeClientProps) {
         </div>
     );
 }
+

@@ -2,36 +2,39 @@
 
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Award, Heart, Leaf, Users } from "lucide-react";
+import { Award, Heart, Leaf, Users } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
-
-const stats = [
-    { label: "Master Spinners", value: "28", icon: Users },
-    { label: "Skilled Weavers", value: "13", icon: Heart },
-    { label: "Years Heritage", value: "50+", icon: Award },
-    { label: "Natural Fibers", value: "100%", icon: Leaf },
-];
-
-const values = [
-    {
-        title: "Heritage Preservation",
-        description: "Keeping the ancient art of Muslin weaving alive in its purest form, passed down through generations in Murshidabad.",
-        image: "https://images.unsplash.com/photo-1606913084603-3e7702b01627?w=600&h=400&fit=crop"
-    },
-    {
-        title: "Artisan Empowerment",
-        description: "Ensuring fair chances and sustainable livelihoods for our community of weavers under KVIC certification.",
-        image: "https://images.unsplash.com/photo-1596253406385-d6c5c00e6205?w=600&h=400&fit=crop"
-    },
-    {
-        title: "Eco-Conscious",
-        description: "Using only natural fibers and traditional hand-operated looms that leave zero carbon footprint.",
-        image: "https://images.unsplash.com/photo-1617627143233-46df7b95c6ff?w=600&h=400&fit=crop"
-    }
-];
+import { Link } from "@/i18n/routing";
+import { useTranslations } from "next-intl";
 
 export default function AboutPage() {
+    const t = useTranslations("About");
+
+    const stats = [
+        { label: t("stats.spinners"), value: "28", icon: Users },
+        { label: t("stats.weavers"), value: "13", icon: Heart },
+        { label: t("stats.heritage"), value: "50+", icon: Award },
+        { label: t("stats.fibers"), value: "100%", icon: Leaf },
+    ];
+
+    const values = [
+        {
+            title: t("values.v1Title"),
+            description: t("values.v1Desc"),
+            image: "https://images.unsplash.com/photo-1606913084603-3e7702b01627?w=600&h=400&fit=crop"
+        },
+        {
+            title: t("values.v2Title"),
+            description: t("values.v2Desc"),
+            image: "https://images.unsplash.com/photo-1596253406385-d6c5c00e6205?w=600&h=400&fit=crop"
+        },
+        {
+            title: t("values.v3Title"),
+            description: t("values.v3Desc"),
+            image: "https://images.unsplash.com/photo-1617627143233-46df7b95c6ff?w=600&h=400&fit=crop"
+        }
+    ];
+
     return (
         <div className="-mt-20">
             {/* Hero Section */}
@@ -53,14 +56,13 @@ export default function AboutPage() {
                         transition={{ duration: 0.8 }}
                     >
                         <p className="text-[var(--saffron-light)] font-medium tracking-wider uppercase text-sm mb-4">
-                            Since 1974
+                            {t("hero.badge")}
                         </p>
                         <h1 className="text-4xl md:text-7xl font-bold mb-6">
-                            Weaving <span className="text-gradient">History</span>
+                            {t("hero.title")}
                         </h1>
                         <p className="text-lg md:text-xl text-white/80 max-w-2xl mx-auto leading-relaxed">
-                            Nabagram Seva Sangha is more than a cooperative. It is a guardian of
-                            Bengal's textile legacy, weaving dreams in silk and muslin.
+                            {t("hero.description")}
                         </p>
                     </motion.div>
                 </div>
@@ -76,22 +78,17 @@ export default function AboutPage() {
                             viewport={{ once: true }}
                         >
                             <h2 className="text-3xl md:text-4xl font-bold text-[var(--silk-indigo)] mb-6">
-                                From the Heart of <br />
-                                <span className="text-gradient">Murshidabad</span>
+                                {t("origin.title")}
                             </h2>
                             <div className="space-y-4 text-[var(--muted)] leading-relaxed">
                                 <p>
-                                    In the historic district of Murshidabad, where the Nawabs once patronized the finest arts,
-                                    Nabagram Seva Sangha was born with a singular mission: to revive the glory of authentic Khadi.
+                                    {t("origin.desc1")}
                                 </p>
                                 <p>
-                                    Certified by the Khadi and Village Industries Commission (KVIC), we operate as a
-                                    direct-benefit community. Every thread bought from us contributes directly to the
-                                    household of a master weaver or spinner.
+                                    {t("origin.desc2")}
                                 </p>
                                 <p>
-                                    Specializing in 100-count Muslin and pure Silk, our fabrics are not manufactured;
-                                    they are birthed through the rhythm of handlooms that clack from dawn to dusk.
+                                    {t("origin.desc3")}
                                 </p>
                             </div>
 
@@ -135,10 +132,10 @@ export default function AboutPage() {
                         className="text-center mb-16"
                     >
                         <h2 className="text-3xl md:text-4xl font-bold text-[var(--silk-indigo)] mb-4">
-                            Our <span className="text-gradient">Core Values</span>
+                            {t("values.title")}
                         </h2>
                         <p className="text-[var(--muted)] max-w-2xl mx-auto">
-                            Principles that guide every warp and weft of our existence.
+                            {t("values.subtitle")}
                         </p>
                     </motion.div>
 
@@ -176,20 +173,20 @@ export default function AboutPage() {
             <section className="py-24 bg-[var(--silk-indigo)] text-white text-center">
                 <div className="container">
                     <h2 className="text-3xl md:text-4xl font-bold mb-6">
-                        Experience the Authenticity
+                        {t("cta.title")}
                     </h2>
                     <p className="text-white/70 max-w-2xl mx-auto mb-8 text-lg">
-                        Visit us in Murshidabad to see the magic unfold, or bring a piece of heritage home today.
+                        {t("cta.description")}
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Link href="/products">
                             <Button size="lg" className="bg-[var(--deep-saffron)] text-white hover:bg-[var(--deep-saffron)]/90">
-                                Shop Collection
+                                {t("cta.shop")}
                             </Button>
                         </Link>
                         <Link href="/contact">
                             <Button variant="outline" size="lg" className="text-white border-white/30 hover:bg-white/10">
-                                Contact Us
+                                {t("cta.contact")}
                             </Button>
                         </Link>
                     </div>
@@ -198,3 +195,4 @@ export default function AboutPage() {
         </div>
     );
 }
+

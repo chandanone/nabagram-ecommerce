@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import {
@@ -21,6 +22,8 @@ import { toast } from "sonner";
 import { SafeProduct } from "@/lib/types";
 
 export default function AdminProductsPage() {
+    const t = useTranslations("AdminProducts");
+    const tCommon = useTranslations("Common");
     const [products, setProducts] = useState<SafeProduct[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [search, setSearch] = useState("");
@@ -81,15 +84,15 @@ export default function AdminProductsPage() {
             >
                 <div>
                     <h1 className="text-3xl font-bold text-[var(--silk-indigo)] mb-2">
-                        Products
+                        {t("title")}
                     </h1>
                     <p className="text-[var(--muted)]">
-                        Manage your product inventory
+                        {t("subtitle")}
                     </p>
                 </div>
                 <Button className="gap-2 bg-[var(--deep-saffron)] hover:bg-[var(--deep-saffron)]/90 text-white" onClick={handleAdd}>
                     <Plus className="h-4 w-4" />
-                    Add Product
+                    {t("add")}
                 </Button>
             </motion.div>
 
@@ -100,7 +103,7 @@ export default function AdminProductsPage() {
                         <div className="flex-1 relative">
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[var(--muted)]" />
                             <Input
-                                placeholder="Search products..."
+                                placeholder={t("search")}
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
                                 className="pl-10 h-11 focus-visible:ring-[var(--deep-saffron)]"
@@ -111,10 +114,10 @@ export default function AdminProductsPage() {
                             onChange={(e) => setFilter(e.target.value)}
                             className="h-11 px-4 rounded-lg border border-[var(--warm-gray)]/30 bg-white text-[var(--silk-indigo)] focus:outline-none focus:ring-2 focus:ring-[var(--deep-saffron)]"
                         >
-                            <option value="">All Types</option>
-                            <option value="MUSLIN">Cotton Muslin</option>
-                            <option value="SILK_SAREE">Silk Sarees</option>
-                            <option value="SILK_THAN">Silk Than</option>
+                            <option value="">{t("allTypes")}</option>
+                            <option value="MUSLIN">{tCommon("fabric.MUSLIN")}</option>
+                            <option value="SILK_SAREE">{tCommon("fabric.SILK_SAREE")}</option>
+                            <option value="SILK_THAN">{tCommon("fabric.SILK_THAN")}</option>
                         </select>
                     </div>
                 </CardContent>
@@ -127,12 +130,12 @@ export default function AdminProductsPage() {
                         <table className="w-full">
                             <thead>
                                 <tr className="border-b border-[var(--warm-gray)]/20">
-                                    <th className="text-left p-4 text-sm font-medium text-[var(--muted)]">Product</th>
-                                    <th className="text-left p-4 text-sm font-medium text-[var(--muted)]">Type</th>
-                                    <th className="text-right p-4 text-sm font-medium text-[var(--muted)]">Price</th>
-                                    <th className="text-center p-4 text-sm font-medium text-[var(--muted)]">Stock</th>
-                                    <th className="text-center p-4 text-sm font-medium text-[var(--muted)]">Featured</th>
-                                    <th className="text-right p-4 text-sm font-medium text-[var(--muted)]">Actions</th>
+                                    <th className="text-left p-4 text-sm font-medium text-[var(--muted)]">{t("table.product")}</th>
+                                    <th className="text-left p-4 text-sm font-medium text-[var(--muted)]">{t("table.type")}</th>
+                                    <th className="text-right p-4 text-sm font-medium text-[var(--muted)]">{t("table.price")}</th>
+                                    <th className="text-center p-4 text-sm font-medium text-[var(--muted)]">{t("table.stock")}</th>
+                                    <th className="text-center p-4 text-sm font-medium text-[var(--muted)]">{t("table.featured")}</th>
+                                    <th className="text-right p-4 text-sm font-medium text-[var(--muted)]">{t("table.actions")}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -141,14 +144,14 @@ export default function AdminProductsPage() {
                                         <tr>
                                             <td colSpan={6} className="p-12 text-center">
                                                 <Loader2 className="h-8 w-8 animate-spin mx-auto text-[var(--deep-saffron)] mb-2" />
-                                                <p className="text-sm text-[var(--muted)]">Loading products...</p>
+                                                <p className="text-sm text-[var(--muted)]">{t("loading")}</p>
                                             </td>
                                         </tr>
                                     ) : filteredProducts.length === 0 ? (
                                         <tr>
                                             <td colSpan={6} className="p-12 text-center text-[var(--muted)]">
                                                 <Package className="h-12 w-12 mx-auto mb-4 opacity-20" />
-                                                No products found
+                                                {t("noProducts")}
                                             </td>
                                         </tr>
                                     ) : (

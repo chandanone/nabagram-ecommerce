@@ -15,14 +15,19 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatPrice } from "@/lib/utils";
-import Link from "next/link";
-import { signOut } from "@/lib/auth";
+import { Link } from "@/i18n/routing";
 import { SignOutButton } from "@/components/auth/sign-out-button";
+import { getTranslations } from "next-intl/server";
 
 export default async function AccountPage() {
+    const t = await getTranslations("Account");
+    const tCommon = await getTranslations("AdminSidebar");
+    const tStatus = await getTranslations("Common.status");
+    const tDashboard = await getTranslations("AdminDashboard");
+
     const session = await auth();
-    if (!session?.user) {
-        redirect("/");
+    if (!session || !session.user) {
+        redirect("/auth/signin");
     }
 
     const orders = await getOrders();
@@ -72,7 +77,7 @@ export default async function AccountPage() {
                                         <Link href="/admin">
                                             <Button variant="ghost" className="w-full justify-start gap-3 mt-2">
                                                 <Shield className="h-4 w-4" />
-                                                Admin Dashboard
+                                                {tCommon("panel")}
                                             </Button>
                                         </Link>
                                     )}
@@ -85,10 +90,10 @@ export default async function AccountPage() {
                     <div className="lg:col-span-2 space-y-6">
                         <div className="flex items-center justify-between">
                             <h2 className="text-2xl font-bold text-[var(--silk-indigo)]">
-                                Order History
+                                {t("orderHistory")}
                             </h2>
                             <span className="text-sm text-[var(--muted)]">
-                                {orders.length} orders total
+                                {t("ordersTotal", { count: orders.length })}
                             </span>
                         </div>
 
@@ -98,10 +103,10 @@ export default async function AccountPage() {
                                     <div className="w-16 h-16 rounded-full bg-[var(--warm-gray)]/10 flex items-center justify-center mb-4">
                                         <ShoppingBag className="h-8 w-8 text-[var(--warm-gray)]" />
                                     </div>
-                                    <h3 className="text-xl font-semibold text-[var(--silk-indigo)]">No orders yet</h3>
-                                    <p className="text-[var(--muted)] mt-2 mb-6">Explore our collections and place your first order.</p>
+                                    <h3 className="text-xl font-semibold text-[var(--silk-indigo)]">{t("noOrders")}</h3>
+                                    <p className="text-[var(--muted)] mt-2 mb-6">{t("noOrdersDesc")}</p>
                                     <Link href="/products">
-                                        <Button>Browse Products</Button>
+                                        <Button>{t("browse")}</Button>
                                     </Link>
                                 </CardContent>
                             </Card>
@@ -115,12 +120,12 @@ export default async function AccountPage() {
                                                     <div className="flex items-center justify-between mb-4">
                                                         <div className="space-y-1">
                                                             <p className="text-[10px] font-bold text-[var(--muted)] uppercase tracking-widest">
-                                                                Order #{order.id.slice(-8).toUpperCase()}
+                                                                {t("orderNumber", { id: order.id.slice(-8).toUpperCase() })}
                                                             </p>
                                                             <div className="flex items-center gap-2 text-[var(--silk-indigo)]">
                                                                 <Calendar className="h-3.5 w-3.5 text-[var(--deep-saffron)]" />
                                                                 <span className="font-bold text-sm">
-                                                                    {new Date(order.createdAt).toLocaleDateString('en-IN', {
+                                                                    {new Date(order.createdAt).toLocaleDateString(undefined, {
                                                                         day: 'numeric',
                                                                         month: 'short',
                                                                         year: 'numeric'
@@ -132,7 +137,7 @@ export default async function AccountPage() {
                                                             order.status === 'PENDING' ? 'bg-yellow-50 text-yellow-700 border-yellow-100' :
                                                                 'bg-blue-50 text-blue-700 border-blue-100'
                                                             }`}>
-                                                            {order.status}
+                                                            {tStatus(order.status)}
                                                         </div>
                                                     </div>
 
@@ -159,7 +164,7 @@ export default async function AccountPage() {
                                                                 {(order.items || []).map(item => item.product.name).join(', ')}
                                                             </p>
                                                             <p className="text-xs text-[var(--muted)] font-medium">
-                                                                {(order.items || []).length} {(order.items || []).length === 1 ? 'item' : 'items'}
+                                                                {t("items", { count: (order.items || []).length })}
                                                             </p>
                                                         </div>
                                                         <div className="text-right">

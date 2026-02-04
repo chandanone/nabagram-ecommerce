@@ -2,11 +2,12 @@
 
 import React from "react";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/routing";
 import { motion } from "framer-motion";
 import { ShoppingCart, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { formatPrice, getFabricLabel, getCountLabel, getOptimizedImageUrl } from "@/lib/utils";
+import { useTranslations, useLocale } from "next-intl";
 
 interface ProductCardProps {
     id: string;
@@ -27,6 +28,9 @@ export function ProductCard({
     image,
     onAddToCart,
 }: ProductCardProps) {
+    const t = useTranslations("Common");
+    const locale = useLocale();
+
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -51,10 +55,10 @@ export function ProductCard({
 
                     {/* Quick actions */}
                     <div className="absolute bottom-4 left-4 right-4 flex gap-2 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-                        <Link href={`/products/${id}`} className="flex-1">
+                        <Link href={`/products/${id}` as any} className="flex-1">
                             <Button variant="glass" className="w-full gap-2">
                                 <Eye className="h-4 w-4" />
-                                View
+                                {t("view")}
                             </Button>
                         </Link>
                         <Button
@@ -87,7 +91,7 @@ export function ProductCard({
                         {name}
                     </h3>
                     <p className="text-xl font-bold text-[var(--silk-indigo)]">
-                        {formatPrice(price)}
+                        {formatPrice(price, locale === 'bn' ? 'bn-IN' : 'en-IN')}
                     </p>
                 </div>
             </div>
@@ -108,3 +112,4 @@ export function ProductCardSkeleton() {
         </div>
     );
 }
+

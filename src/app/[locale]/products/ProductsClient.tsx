@@ -6,29 +6,19 @@ import { Filter, Grid, List, SlidersHorizontal } from "lucide-react";
 import { ProductCard } from "@/components/products/product-card";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useRouter } from "@/i18n/routing";
 import { toast } from "sonner";
 import { SafeProduct } from "@/lib/types";
+import { useTranslations } from "next-intl";
 
 interface ProductsClientProps {
     products: SafeProduct[];
 }
 
-const fabricTypes = [
-    { value: "", label: "All Types" },
-    { value: "MUSLIN", label: "Cotton Muslin" },
-    { value: "SILK_SAREE", label: "Silk Sarees" },
-    { value: "SILK_THAN", label: "Silk Than" },
-];
-
-const fabricCounts = [
-    { value: "", label: "All Counts" },
-    { value: "60", label: "60s Count" },
-    { value: "80", label: "80s Count" },
-    { value: "100", label: "100s Count" },
-];
-
 export default function ProductsClient({ products }: ProductsClientProps) {
+    const t = useTranslations("Products");
+    const c = useTranslations("Common");
     const searchParams = useSearchParams();
     const router = useRouter();
     const [showFilters, setShowFilters] = useState(false);
@@ -36,6 +26,20 @@ export default function ProductsClient({ products }: ProductsClientProps) {
 
     const typeFilter = searchParams.get("type") || "";
     const countFilter = searchParams.get("count") || "";
+
+    const fabricTypes = [
+        { value: "", label: t("types.all") },
+        { value: "MUSLIN", label: t("types.muslin") },
+        { value: "SILK_SAREE", label: t("types.silkSaree") },
+        { value: "SILK_THAN", label: t("types.silkThan") },
+    ];
+
+    const fabricCounts = [
+        { value: "", label: t("counts.all") },
+        { value: "60", label: t("counts.60") },
+        { value: "80", label: t("counts.80") },
+        { value: "100", label: t("counts.100") },
+    ];
 
     const updateFilter = (key: string, value: string) => {
         const params = new URLSearchParams(searchParams.toString());
@@ -56,7 +60,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
             fabricType: product.fabricType.toString(),
             fabricCount: product.fabricCount || undefined,
         });
-        toast.success(`${product.name} added to cart`);
+        toast.success(c("successAdded", { name: product.name }));
     };
 
     return (
@@ -70,11 +74,10 @@ export default function ProductsClient({ products }: ProductsClientProps) {
                         className="text-center max-w-3xl mx-auto"
                     >
                         <h1 className="text-4xl md:text-5xl font-bold text-[var(--silk-indigo)] mb-4">
-                            Our <span className="text-gradient">Collections</span>
+                            {t("title")}
                         </h1>
                         <p className="text-[var(--muted)] text-lg">
-                            Explore our curated selection of premium handwoven textiles,
-                            crafted by master artisans of Murshidabad.
+                            {t("description")}
                         </p>
                     </motion.div>
                 </div>
@@ -92,10 +95,10 @@ export default function ProductsClient({ products }: ProductsClientProps) {
                                 className="gap-2"
                             >
                                 <SlidersHorizontal className="h-4 w-4" />
-                                Filters
+                                {t("filters")}
                             </Button>
                             <span className="text-[var(--muted)] text-sm">
-                                {products.length} products
+                                {t("count", { count: products.length })}
                             </span>
                         </div>
 
@@ -120,7 +123,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div>
                                     <label className="block text-sm font-medium text-[var(--silk-indigo)] mb-2">
-                                        Fabric Type
+                                        {t("fabricType")}
                                     </label>
                                     <select
                                         value={typeFilter}
@@ -137,7 +140,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
 
                                 <div>
                                     <label className="block text-sm font-medium text-[var(--silk-indigo)] mb-2">
-                                        Thread Count
+                                        {t("threadCount")}
                                     </label>
                                     <select
                                         value={countFilter}
@@ -158,7 +161,7 @@ export default function ProductsClient({ products }: ProductsClientProps) {
                                         onClick={() => router.push("/products")}
                                         className="w-full"
                                     >
-                                        Clear Filters
+                                        {t("clearFilters")}
                                     </Button>
                                 </div>
                             </div>
@@ -189,13 +192,13 @@ export default function ProductsClient({ products }: ProductsClientProps) {
                         >
                             <Filter className="h-16 w-16 mx-auto text-[var(--warm-gray)] mb-4" />
                             <h3 className="text-xl font-semibold text-[var(--silk-indigo)] mb-2">
-                                No products found
+                                {t("noProducts")}
                             </h3>
                             <p className="text-[var(--muted)] mb-6">
-                                Try adjusting your filters to find what you&apos;re looking for.
+                                {t("noProductsDesc")}
                             </p>
                             <Button onClick={() => router.push("/products")}>
-                                Clear Filters
+                                {t("clearFilters")}
                             </Button>
                         </motion.div>
                     )}
@@ -204,3 +207,4 @@ export default function ProductsClient({ products }: ProductsClientProps) {
         </div>
     );
 }
+
