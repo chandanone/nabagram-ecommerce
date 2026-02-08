@@ -6,14 +6,23 @@ import { Send, CheckCircle, AlertCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { submitContactForm } from "@/actions/contact";
 import { useTranslations } from "next-intl";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 
 export function ContactForm() {
     const t = useTranslations("ContactForm");
+    const { executeRecaptcha } = useGoogleReCaptcha();
     const [formState, setFormState] = useState<"idle" | "submitting" | "success" | "error">("idle");
     const [errorMessage, setErrorMessage] = useState("");
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        if (!executeRecaptcha) {
+            setFormState("error");
+            setErrorMessage("reCAPTCHA not yet available. Please try again.");
+            return;
+        }
+
         setFormState("submitting");
         setErrorMessage("");
 
@@ -26,7 +35,9 @@ export function ContactForm() {
         };
 
         try {
-            const result = await submitContactForm(data);
+            const token = await executeRecaptcha("contact_form");
+
+            const result = await submitContactForm(data, token);
             if (result.success) {
                 setFormState("success");
                 (e.target as HTMLFormElement).reset();

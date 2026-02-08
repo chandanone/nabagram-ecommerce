@@ -25,7 +25,7 @@ export function Footer() {
         <footer className="bg-[var(--silk-indigo)] text-white">
             {/* Main Footer */}
             <div className="container section">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
                     {/* Brand Info */}
                     <div className="lg:col-span-1">
                         <div className="flex items-center gap-3 mb-6">
@@ -64,7 +64,7 @@ export function Footer() {
 
                     {/* Quick Links */}
                     <div>
-                        <h4 className="font-semibold text-lg mb-6">{t("linksTitle")}</h4>
+                        <h4 className="font-semibold text-lg mb-6 flex-row sm:flex-col">{t("linksTitle")}</h4>
                         <ul className="space-y-3">
                             {quickLinks.map((link) => (
                                 <li key={link.href}>

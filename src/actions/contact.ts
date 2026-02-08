@@ -2,6 +2,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { verifyRecaptcha } from "@/lib/recaptcha";
 
 const ContactSchema = z.object({
     name: z.string().min(2, "Name must be at least 2 characters"),
@@ -12,8 +13,14 @@ const ContactSchema = z.object({
 
 export type ContactFormData = z.infer<typeof ContactSchema>;
 
-export async function submitContactForm(data: ContactFormData) {
+export async function submitContactForm(data: ContactFormData, token: string) {
     try {
+        // Verify reCAPTCHA
+        const recaptchaResult = await verifyRecaptcha(token);
+        if (!recaptchaResult.success) {
+            return { success: false, error: recaptchaResult.error || "Security check failed. Please try again." };
+        }
+
         const validatedData = ContactSchema.parse(data);
 
         const message = await prisma.contactMessage.create({

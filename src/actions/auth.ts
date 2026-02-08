@@ -2,8 +2,15 @@
 
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
+import { verifyRecaptcha } from "@/lib/recaptcha"
 
-export async function register(formData: FormData) {
+export async function register(formData: FormData, token: string) {
+    // Verify reCAPTCHA
+    const recaptchaResult = await verifyRecaptcha(token);
+    if (!recaptchaResult.success) {
+        return { error: recaptchaResult.error || "Security check failed" };
+    }
+
     const name = formData.get("name") as string
     const email = formData.get("email") as string
     const password = formData.get("password") as string

@@ -11,8 +11,10 @@ import { toast } from "sonner"
 import { useRouter } from "next/navigation"
 import { Mail, Lock, User, Eye, EyeOff, Loader2 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3"
 
 export default function AuthPage() {
+    const { executeRecaptcha } = useGoogleReCaptcha()
     const [isLogin, setIsLogin] = useState(true)
     const [isLoading, setIsLoading] = useState(false)
     const [showPassword, setShowPassword] = useState(false)
@@ -20,6 +22,12 @@ export default function AuthPage() {
 
     async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault()
+
+        if (!executeRecaptcha) {
+            toast.error("reCAPTCHA not ready")
+            return
+        }
+
         setIsLoading(true)
 
         const formData = new FormData(event.currentTarget)
@@ -46,7 +54,8 @@ export default function AuthPage() {
                     }
                 }
             } else {
-                const result = await register(formData)
+                const token = await executeRecaptcha("register")
+                const result = await register(formData, token)
                 if (result?.error) {
                     toast.error(result.error)
                 } else {
