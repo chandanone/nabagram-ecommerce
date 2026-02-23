@@ -1,7 +1,8 @@
 "use client";
 
 import { Link } from "@/i18n/routing";
-import { Mail, Phone, MapPin, Instagram, Facebook, Twitter } from "lucide-react";
+import { Mail, Phone, MapPin, Instagram, Facebook, Twitter, Heart } from "lucide-react";
+import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 
 export function Footer() {
@@ -135,6 +136,29 @@ export function Footer() {
                     <p className="text-white/60 text-sm">
                         {t("rights", { year: new Date().getFullYear() })}
                     </p>
+                    <div className="flex items-center gap-2 text-sm font-bold text-white/50">
+                        Crafted with
+                        <div className="relative flex items-center justify-center w-4 h-4">
+                            <Heart className="w-4 h-4 text-red-500 hover:scale-110 transition-transform" />
+                            <motion.div
+                                animate={{
+                                    opacity: [0, 1, 0],
+                                    scale: [1, 1.2, 1]
+                                }}
+                                transition={{
+                                    repeat: Infinity,
+                                    duration: 2,
+                                    times: [0, 0.5, 1],
+                                    repeatDelay: 1
+                                }}
+                                className="absolute inset-0 flex items-center justify-center"
+                            >
+                                <Heart className="w-4 h-4 text-red-500 fill-red-500" />
+                            </motion.div>
+                        </div>
+                        by <span className="text-white font-black tracking-tight hover:text-[var(--deep-saffron)] transition-colors cursor-pointer">CharuAILabs</span>
+                    </div>
+
                     <div className="flex gap-6">
                         {legalLinks.map((link) => (
                             <Link
