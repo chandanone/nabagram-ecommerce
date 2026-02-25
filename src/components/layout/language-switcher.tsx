@@ -23,7 +23,7 @@ export function LanguageSwitcher() {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-2 px-2">
+                <Button variant="ghost" size="sm" className="gap-2 px-2" data-testid="language-switcher">
                     <Languages className="h-4 w-4 text-[var(--deep-saffron)]" />
                     <span className="text-xs font-bold uppercase">{locale}</span>
                 </Button>
