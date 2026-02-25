@@ -39,7 +39,7 @@ export function ProductCard({
             transition={{ duration: 0.5 }}
             className="group"
         >
-            <div className="glass rounded-2xl overflow-hidden group-hover:shadow-xl transition-all duration-500 group-hover:-translate-y-2">
+            <div className="glass rounded-2xl overflow-hidden group-hover:shadow-xl transition-all duration-500 group-hover:-translate-y-2" data-testid="product-card">
                 {/* Image Container */}
                 <div className="relative aspect-[3/4] overflow-hidden">
                     <Image
