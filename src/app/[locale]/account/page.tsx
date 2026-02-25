@@ -19,8 +19,8 @@ import { Link } from "@/i18n/routing";
 import { SignOutButton } from "@/components/auth/sign-out-button";
 import { getTranslations } from "next-intl/server";
 
-export default async function AccountPage({ params }: { params: { locale: string } }) {
-    const { locale } = params;
+export default async function AccountPage({ params }: { params: Promise<{ locale: string }> }) {
+    const { locale } = await params;
     const t = await getTranslations("Account");
     const tCommon = await getTranslations("AdminSidebar");
     const tStatus = await getTranslations("Common.status");

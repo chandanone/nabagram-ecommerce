@@ -21,7 +21,7 @@ const createPrismaClient = () => {
     // Add these for serverless stability:
     max: 10,                 // Limit the number of clients in the pool
     idleTimeoutMillis: 30000, // Close idle clients after 30 seconds
-    connectionTimeoutMillis: 2000, // Return an error if a connection takes > 2 seconds
+    connectionTimeoutMillis: 10000, // Return an error if a connection takes > 10 seconds
   });
 
   const adapter = new PrismaPg(pool);
